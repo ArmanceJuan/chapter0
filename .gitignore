@@ -24,4 +24,9 @@ dist-ssr
 *.sw?
 
 # env
-.env
+chapter0_backend/.env
+chapter0_frontend/.env
+
+# node_modules
+chapter0_backend/node_modules
+chapter0_frontend/node_modules
