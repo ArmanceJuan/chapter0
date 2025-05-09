@@ -7,10 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# Output folder
 dist
 dist-ssr
-*.local
+.vite/
 
 # Editor directories and files
 .vscode/*
@@ -24,9 +24,12 @@ dist-ssr
 *.sw?
 
 # env
-chapter0_backend/.env
-chapter0_frontend/.env
+*.local
+*.env
 
 # node_modules
 chapter0_backend/node_modules
 chapter0_frontend/node_modules
+
+# Drizzle
+chapter0_backend/drizzle
