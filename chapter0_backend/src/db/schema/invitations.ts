@@ -1,10 +1,10 @@
-import { pgTable, serial, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, integer } from "drizzle-orm/pg-core";
 import { users } from "./users";
 import { projects } from "./projects";
 import { roleEnum } from "./enums";
 
 export const invitations = pgTable("invitations", {
-  invitationId: serial("invitation_id").primaryKey(),
+  invitationId: uuid("invitation_id").primaryKey().defaultRandom(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.userId),

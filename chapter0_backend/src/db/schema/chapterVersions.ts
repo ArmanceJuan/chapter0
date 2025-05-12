@@ -1,8 +1,8 @@
-import { pgTable, serial, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, uuid, integer, timestamp } from "drizzle-orm/pg-core";
 import { chapters } from "./chapters";
 
 export const chapterVersions = pgTable("chapter_versions", {
-  chapterVersionId: serial("chapter_version_id").primaryKey(),
+  chapterVersionId: uuid("chapter_version_id").primaryKey().defaultRandom(),
   chapterId: integer("chapter_id")
     .notNull()
     .references(() => chapters.chapterId),

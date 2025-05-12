@@ -1,6 +1,6 @@
 import {
   pgTable,
-  serial,
+  uuid,
   text,
   timestamp,
   boolean,
@@ -10,7 +10,7 @@ import { users } from "./users";
 import { projects } from "./projects";
 
 export const notifications = pgTable("notifications", {
-  notificationId: serial("notification_id").primaryKey(),
+  notificationId: uuid("notification_id").primaryKey().defaultRandom(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.userId),

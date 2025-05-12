@@ -1,6 +1,6 @@
 import {
   pgTable,
-  serial,
+  uuid,
   text,
   timestamp,
   boolean,
@@ -9,7 +9,7 @@ import {
 import { users } from "./users";
 
 export const projects = pgTable("projects", {
-  projectId: serial("project_id").primaryKey(),
+  projectId: uuid("project_id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
   ownerId: integer("owner_id")
     .notNull()

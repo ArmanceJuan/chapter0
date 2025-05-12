@@ -1,9 +1,9 @@
-import { pgTable, serial, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, integer } from "drizzle-orm/pg-core";
 import { commentTargetEnum } from "./enums";
 import { users } from "./users";
 
 export const comments = pgTable("comments", {
-  commentId: serial("comment_id").primaryKey(),
+  commentId: uuid("comment_id").primaryKey().defaultRandom(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.userId),
