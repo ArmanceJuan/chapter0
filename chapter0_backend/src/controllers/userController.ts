@@ -46,7 +46,7 @@ export const createUser = async (
 };
 
 export const getUserById = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   const { id } = req.params;
@@ -70,13 +70,18 @@ export const getUserById = async (
 };
 
 export const updateUser = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
-  const { id } = req.params;
+  const { userId } = req.params;
   const { email, username, password } = req.body;
   try {
-    const user = await db.select().from(users).where(eq(users.userId, id));
+    const user = await db.select().from(users).where(eq(users.userId, userId));
+
+    if (!req.user || req.user.userId !== userId) {
+      res.status(403).json({ error: "Forbidden : It's not your account" });
+      return;
+    }
     if (user.length === 0) {
       res.status(404).json({ error: "User not found" });
     }
@@ -84,8 +89,8 @@ export const updateUser = async (
       const emailExists = await db
         .select()
         .from(users)
-        .where(eq(users.email, email));
-      if (emailExists.length > 0 && emailExists[0].userId !== id) {
+        .where(eq(users.userId, userId));
+      if (emailExists.length > 0 && emailExists[0].userId !== userId) {
         res.status(400).json({ error: "Email already is not available" });
         return;
       }
@@ -97,6 +102,7 @@ export const updateUser = async (
       password?: string;
       updatedAt?: Date;
     };
+
     const updates: UserUpdate = {};
     if (email) updates.email = email;
     if (username) updates.username = username;
@@ -106,7 +112,7 @@ export const updateUser = async (
     }
     updates.updatedAt = new Date();
 
-    await db.update(users).set(updates).where(eq(users.userId, id));
+    await db.update(users).set(updates).where(eq(users.userId, userId));
 
     res.status(200).json({ message: "User updated successfully" });
   } catch (error) {
@@ -116,19 +122,23 @@ export const updateUser = async (
 };
 
 export const deleteUser = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   try {
-    const { id } = req.params;
-    const user = await db.select().from(users).where(eq(users.userId, id));
+    const { userId } = req.params;
+    const user = await db.select().from(users).where(eq(users.userId, userId));
 
+    if (!req.user || req.user.userId !== userId) {
+      res.status(403).json({ error: "Forbidden : It's not your account" });
+      return;
+    }
     if (user.length === 0) {
       res.status(404).json({ error: "User not found" });
       return;
     }
 
-    await db.delete(users).where(eq(users.userId, id));
+    await db.delete(users).where(eq(users.userId, userId));
 
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
@@ -181,7 +191,53 @@ export const logoutUser = async (
   }
 };
 
-// TODO: Implement password reset functionality
+export const resetPassword = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    if (!oldPassword || !newPassword) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
+    }
+
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.userId, req.user.userId));
+
+    if (user.length === 0) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const isValidPassword = await bcrypt.compare(oldPassword, user[0].password);
+
+    if (!isValidPassword) {
+      res.status(401).json({ error: "Invalid password" });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await db
+      .update(users)
+      .set({ password: hashedPassword, updatedAt: new Date() })
+      .where(eq(users.userId, req.user.userId));
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error: any) {
+    console.error("Error resetting password:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 export const getMe = async (
   req: AuthenticatedRequest,
