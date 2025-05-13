@@ -10,7 +10,7 @@ import { projects } from "./projects";
 
 export const places = pgTable("places", {
   placeId: uuid("place_id").primaryKey().defaultRandom(),
-  projectId: integer("project_id")
+  projectId: uuid("project_id")
     .notNull()
     .references(() => projects.projectId),
   placeName: text("place_name").notNull(),

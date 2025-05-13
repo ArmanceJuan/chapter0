@@ -4,10 +4,10 @@ import { projects } from "./projects";
 
 export const notes = pgTable("notes", {
   noteId: uuid("note_id").primaryKey().defaultRandom(),
-  userId: integer("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => users.userId),
-  projectId: integer("project_id")
+  projectId: uuid("project_id")
     .notNull()
     .references(() => projects.projectId),
   noteContent: text("note_content").notNull(),

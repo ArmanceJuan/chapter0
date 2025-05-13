@@ -19,8 +19,10 @@ export const authMiddleware = async (
 ) => {
   const authToken = req.headers.authorization;
 
-  if (!authToken || authToken.startsWith("Bearer ")) {
-    res.status(401).json({ message: "Authorization header missing" });
+  if (!authToken || !authToken.startsWith("Bearer ")) {
+    res
+      .status(401)
+      .json({ message: "Authorization header missing or invalid" });
     return;
   }
 

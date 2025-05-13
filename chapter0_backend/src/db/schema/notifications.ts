@@ -11,10 +11,10 @@ import { projects } from "./projects";
 
 export const notifications = pgTable("notifications", {
   notificationId: uuid("notification_id").primaryKey().defaultRandom(),
-  userId: integer("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => users.userId),
-  projectId: integer("project_id")
+  projectId: uuid("project_id")
     .notNull()
     .references(() => projects.projectId),
   notificationContent: text("notification_content").notNull(),

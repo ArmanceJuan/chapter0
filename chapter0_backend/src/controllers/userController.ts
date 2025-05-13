@@ -49,7 +49,7 @@ export const getUserById = async (
   req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
-  const { id } = req.params;
+  const { userId } = req.params;
   try {
     const user = await db
       .select({
@@ -58,7 +58,7 @@ export const getUserById = async (
         username: users.username,
       })
       .from(users)
-      .where(eq(users.userId, id));
+      .where(eq(users.userId, userId));
     if (user.length === 0) {
       res.status(404).json({ error: "User not found" });
     }
@@ -74,22 +74,22 @@ export const updateUser = async (
   res: Response
 ): Promise<void> => {
   const { userId } = req.params;
-  const { email, username, password } = req.body;
+  const { email, username, password, currentPassword } = req.body;
   try {
     const user = await db.select().from(users).where(eq(users.userId, userId));
 
-    if (!req.user || req.user.userId !== userId) {
+    if (!req.user || req.user.userId !== req.params.userId) {
       res.status(403).json({ error: "Forbidden : It's not your account" });
       return;
     }
     if (user.length === 0) {
       res.status(404).json({ error: "User not found" });
     }
-    if (email) {
+    if (email && email !== user[0].email) {
       const emailExists = await db
         .select()
         .from(users)
-        .where(eq(users.userId, userId));
+        .where(eq(users.email, email));
       if (emailExists.length > 0 && emailExists[0].userId !== userId) {
         res.status(400).json({ error: "Email already is not available" });
         return;
@@ -107,6 +107,19 @@ export const updateUser = async (
     if (email) updates.email = email;
     if (username) updates.username = username;
     if (password) {
+      if (!currentPassword) {
+        res.status(400).json({ error: "Missing password" });
+        return;
+      }
+      const isValidPassword = await bcrypt.compare(
+        currentPassword,
+        user[0].password
+      );
+      if (!isValidPassword) {
+        res.status(401).json({ error: "Invalid password" });
+        return;
+      }
+
       const hashedPassword = await bcrypt.hash(password, 10);
       updates.password = hashedPassword;
     }

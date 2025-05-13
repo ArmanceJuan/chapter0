@@ -5,10 +5,10 @@ import { roleEnum } from "./enums";
 
 export const invitations = pgTable("invitations", {
   invitationId: uuid("invitation_id").primaryKey().defaultRandom(),
-  userId: integer("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => users.userId),
-  projectId: integer("project_id")
+  projectId: uuid("project_id")
     .notNull()
     .references(() => projects.projectId),
   invitationEmail: text("invitation_email").notNull(),

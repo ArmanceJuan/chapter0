@@ -10,7 +10,7 @@ import { projects } from "./projects";
 
 export const storyArcs = pgTable("story_arcs", {
   storyArcId: uuid("story_arc_id").primaryKey().defaultRandom(),
-  projectId: integer("project_id")
+  projectId: uuid("project_id")
     .notNull()
     .references(() => projects.projectId),
   storyArcTitle: text("story_arc_title").notNull(),

@@ -1,16 +1,9 @@
-import {
-  pgTable,
-  uuid,
-  text,
-  timestamp,
-  boolean,
-  integer,
-} from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, boolean } from "drizzle-orm/pg-core";
 import { projects } from "./projects";
 
 export const characters = pgTable("characters", {
   characterId: uuid("character_id").primaryKey().defaultRandom(),
-  projectId: integer("project_id")
+  projectId: uuid("project_id")
     .notNull()
     .references(() => projects.projectId),
   characterName: text("character_name").notNull(),

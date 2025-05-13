@@ -5,10 +5,16 @@ import * as schema from "./schema";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: true,
 });
 
 export const db = drizzle(pool, { schema });
 
-export const { users, projects, projectUsers, chapters, places, storyArcs } =
-  schema;
+export const {
+  users,
+  projects,
+  projectUsers,
+  chapters,
+  characters,
+  places,
+  storyArcs,
+} = schema;
