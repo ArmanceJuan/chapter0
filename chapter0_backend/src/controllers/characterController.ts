@@ -21,11 +21,11 @@ export const createCharacter = async (
     } = req.body;
 
     const userId = req.user?.userId;
-
     if (!userId || !projectId) {
       res.status(400).json({ error: "Missing user or project id" });
       return;
     }
+
     const isOwner = await isProjectOwner(projectId, userId);
     if (!isOwner) {
       res
@@ -99,6 +99,7 @@ export const getAllCharactersByProject = async (
       res.status(400).json({ error: "Missing project id" });
       return;
     }
+
     const allCharacters = await db
       .select()
       .from(characters)
@@ -127,7 +128,6 @@ export const updateCharacter = async (
     } = req.body;
 
     const userId = req.user?.userId;
-
     if (!userId || !characterId || !projectId) {
       res.status(400).json({ error: "Missing user, project or character id" });
       return;
