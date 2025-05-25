@@ -1,0 +1,18 @@
+.project-infos {
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+
+  &__actions {
+    align-items: center;
+
+    &__button {
+      margin-left: 1.5rem;
+      background: transparent;
+      border: none;
+    }
+  }
+}

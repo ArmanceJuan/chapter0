@@ -1,0 +1,22 @@
+@use "../abstracts/variables" as variables;
+@use "../abstracts/typographies" as typo;
+
+.button {
+  padding: 0.75rem 1.5rem;
+  border-radius: variables.$border-radius;
+  font-size: typo.$font-size-base;
+  border: none;
+  margin: 0.5rem;
+  transition: variables.$transiton;
+  background-color: theme(primary);
+  color: theme(text);
+  cursor: pointer;
+
+  &:hover {
+    background-color: theme(hover);
+  }
+  &.secondary {
+    background-color: theme(secondary);
+    color: theme(text);
+  }
+}

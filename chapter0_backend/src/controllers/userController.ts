@@ -11,7 +11,7 @@ export const createUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { email, username, password } = req.body;
+  const { email, username, password, isAdmin } = req.body;
   try {
     if (!email || !username || !password) {
       res.status(400).json({ error: "Missing required fields" });
@@ -31,16 +31,51 @@ export const createUser = async (
 
     const newUser = await db
       .insert(users)
-      .values({ email, username, password: hashedPassword })
+      .values({ email, username, password: hashedPassword, isAdmin })
       .returning();
     const createdUser = newUser[0];
 
-    const token = jwt.sign({ userId: createdUser.userId }, JWT_SECRET, {
-      expiresIn: "3d",
+    const token = jwt.sign(
+      {
+        id: createdUser.id,
+        email: createdUser.email,
+        username: createdUser.username,
+        isAdmin: createdUser.isAdmin,
+      },
+      JWT_SECRET,
+      {
+        expiresIn: "3d",
+      }
+    );
+    res.status(201).json({
+      message: "User created successfully",
+      token,
+      user: {
+        id: createdUser.id,
+        email: createdUser.email,
+        username: createdUser.username,
+        isAdmin: createdUser.isAdmin,
+      },
     });
-    res.status(201).json({ message: "User created successfully", token });
   } catch (error) {
     console.error("Error creating user:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getAllUsers = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user?.isAdmin) {
+      res.status(403).json({ error: "Forbidden : Your are not an admin" });
+      return;
+    }
+    const allUsers = await db.select().from(users).orderBy(users.username);
+    res.status(200).json(allUsers);
+  } catch (error) {
+    console.error("Error fetching users:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -49,16 +84,16 @@ export const getUserById = async (
   req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
-  const { userId } = req.params;
+  const { id } = req.params;
   try {
     const user = await db
       .select({
-        userId: users.userId,
+        id: users.id,
         email: users.email,
         username: users.username,
       })
       .from(users)
-      .where(eq(users.userId, userId));
+      .where(eq(users.id, id));
     if (user.length === 0) {
       res.status(404).json({ error: "User not found" });
     }
@@ -73,12 +108,16 @@ export const updateUser = async (
   req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
-  const { userId } = req.params;
+  const id = req.params.id || req.params.userId;
   const { email, username, password, currentPassword } = req.body;
   try {
-    const user = await db.select().from(users).where(eq(users.userId, userId));
+    console.log("req.user.id controller =", id);
+    console.log("req.user.id =", req.user?.id);
+    console.log("req.params.id =", req.params.id);
 
-    if (!req.user || req.user.userId !== req.params.userId) {
+    const user = await db.select().from(users).where(eq(users.id, id));
+
+    if (!req.user || req.user.id !== id) {
       res.status(403).json({ error: "Forbidden : It's not your account" });
       return;
     }
@@ -90,7 +129,7 @@ export const updateUser = async (
         .select()
         .from(users)
         .where(eq(users.email, email));
-      if (emailExists.length > 0 && emailExists[0].userId !== userId) {
+      if (emailExists.length > 0 && emailExists[0].id !== id) {
         res.status(400).json({ error: "Email already is not available" });
         return;
       }
@@ -125,11 +164,30 @@ export const updateUser = async (
     }
     updates.updatedAt = new Date();
 
-    await db.update(users).set(updates).where(eq(users.userId, userId));
+    await db.update(users).set(updates).where(eq(users.id, id));
 
     res.status(200).json({ message: "User updated successfully" });
   } catch (error) {
     console.error("Error updating user:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const promoteToAdmin = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user?.isAdmin) {
+      res.status(403).json({ error: "Forbidden : Your are not an admin" });
+      return;
+    }
+    const { id } = req.params;
+    const user = await db.select().from(users).where(eq(users.id, id));
+
+    res.status(200).json({ message: "User promoted to admin successfully" });
+  } catch (error) {
+    console.error("Error promoting user to admin:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -139,10 +197,10 @@ export const deleteUser = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { userId } = req.params;
-    const user = await db.select().from(users).where(eq(users.userId, userId));
+    const { id } = req.params;
+    const user = await db.select().from(users).where(eq(users.id, id));
 
-    if (!req.user || req.user.userId !== userId) {
+    if (!req.user || req.user.id !== id) {
       res.status(403).json({ error: "Forbidden : It's not your account" });
       return;
     }
@@ -151,7 +209,7 @@ export const deleteUser = async (
       return;
     }
 
-    await db.delete(users).where(eq(users.userId, userId));
+    await db.delete(users).where(eq(users.id, id));
 
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
@@ -182,10 +240,28 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const token = jwt.sign({ userId: user[0].userId }, JWT_SECRET, {
-      expiresIn: "3d",
+    const token = jwt.sign(
+      {
+        id: user[0].id,
+        isAdmin: user[0].isAdmin,
+        username: user[0].username,
+        email: user[0].email,
+      },
+      JWT_SECRET,
+      {
+        expiresIn: "3d",
+      }
+    );
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user[0].id,
+        email: user[0].email,
+        username: user[0].username,
+        isAdmin: user[0].isAdmin,
+      },
     });
-    res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.error("Error logging in user:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -221,10 +297,7 @@ export const resetPassword = async (
       return;
     }
 
-    const user = await db
-      .select()
-      .from(users)
-      .where(eq(users.userId, req.user.userId));
+    const user = await db.select().from(users).where(eq(users.id, req.user.id));
 
     if (user.length === 0) {
       res.status(404).json({ error: "User not found" });
@@ -243,7 +316,7 @@ export const resetPassword = async (
     await db
       .update(users)
       .set({ password: hashedPassword, updatedAt: new Date() })
-      .where(eq(users.userId, req.user.userId));
+      .where(eq(users.id, req.user.id));
 
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error: any) {
@@ -261,8 +334,8 @@ export const getMe = async (
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    const { userId, email, username } = req.user;
-    res.status(200).json({ userId, email, username });
+    const { id, email, username, isAdmin } = req.user;
+    res.status(200).json({ id, email, username, isAdmin });
   } catch (error) {
     console.error("Error fetching user:", error);
     res.status(500).json({ error: "Internal Server Error" });

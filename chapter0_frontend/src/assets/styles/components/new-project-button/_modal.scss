@@ -1,0 +1,63 @@
+@use "../../abstracts/variables" as variables;
+
+.modal-container {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  z-index: 10;
+  padding: 1rem;
+  margin: 3rem;
+  display: flex;
+  justify-content: center;
+}
+
+.modal {
+  width: 90vw;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  background-color: rgb(224, 224, 224);
+  gap: 1rem;
+  padding: 1rem;
+  box-sizing: border-box;
+
+  &__button-close {
+    background: none;
+    border: none;
+    text-align: end;
+    padding-inline: 1rem;
+
+    &__icon {
+      font-size: 2rem;
+      color: black;
+
+      &:hover {
+        color: red;
+      }
+    }
+  }
+
+  &_create-h2 {
+    padding-bottom: 1.5rem;
+  }
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+
+    button {
+      width: 20rem;
+      padding: 1rem;
+      border: none;
+      border-radius: variables.$border-radius;
+    }
+
+    &__create-button {
+      padding-top: 1rem;
+    }
+  }
+}

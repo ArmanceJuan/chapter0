@@ -1,7 +1,7 @@
 export * from "./schema/enums";
 export * from "./schema/users";
 export * from "./schema/projects";
-export * from "./schema/projectUsers";
+export * from "./schema/usersProject";
 export * from "./schema/chapters";
 export * from "./schema/places";
 export * from "./schema/storyArcs";
@@ -11,3 +11,16 @@ export * from "./schema/notifications";
 export * from "./schema/notes";
 export * from "./schema/invitations";
 export * from "./schema/chapterVersions";
+
+import "./schema/users";
+import "./schema/projects";
+import "./schema/usersProject";
+import "./schema/chapters";
+import "./schema/places";
+import "./schema/storyArcs";
+import "./schema/characters";
+import "./schema/comments";
+import "./schema/notifications";
+import "./schema/notes";
+import "./schema/invitations";
+import "./schema/chapterVersions";

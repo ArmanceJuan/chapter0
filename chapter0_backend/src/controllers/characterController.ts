@@ -2,7 +2,6 @@ import { Response } from "express";
 import { eq } from "drizzle-orm";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { db, characters } from "../db";
-import { isProjectOwner } from "../utils/isOwner";
 
 export const createCharacter = async (
   req: AuthenticatedRequest,
@@ -11,30 +10,23 @@ export const createCharacter = async (
   try {
     const { projectId } = req.params;
     const {
-      characterName,
-      characterDescription,
-      characterHistory,
-      characterpsychologicalProfile,
-      characterRelationships,
-      characterImageUrl,
-      characterStatus,
+      name,
+      description,
+      age,
+      history,
+      psychologicalProfile,
+      relationships,
+      imageUrl,
+      status,
     } = req.body;
 
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
     if (!userId || !projectId) {
       res.status(400).json({ error: "Missing user or project id" });
       return;
     }
 
-    const isOwner = await isProjectOwner(projectId, userId);
-    if (!isOwner) {
-      res
-        .status(403)
-        .json({ error: "User is not authorized to create a character" });
-      return;
-    }
-
-    if (!characterName) {
+    if (!name) {
       res.status(400).json({ error: "Missing required fields" });
       return;
     }
@@ -43,13 +35,14 @@ export const createCharacter = async (
       .insert(characters)
       .values({
         projectId,
-        characterName,
-        characterDescription,
-        characterHistory,
-        characterpsychologicalProfile,
-        characterRelationships,
-        characterImageUrl,
-        characterStatus,
+        name,
+        age,
+        description,
+        history,
+        psychologicalProfile,
+        relationships,
+        imageUrl,
+        status,
       })
       .returning();
 
@@ -76,7 +69,7 @@ export const getCharacterById = async (
     const character = await db
       .select()
       .from(characters)
-      .where(eq(characters.characterId, characterId));
+      .where(eq(characters.id, characterId));
 
     if (character.length === 0) {
       res.status(404).json({ error: "Character not found" });
@@ -118,33 +111,26 @@ export const updateCharacter = async (
   try {
     const { characterId, projectId } = req.params;
     const {
-      characterName,
-      characterDescription,
-      characterHistory,
-      characterpsychologicalProfile,
-      characterRelationships,
-      characterImageUrl,
-      characterStatus,
+      name,
+      description,
+      age,
+      history,
+      psychologicalProfile,
+      relationships,
+      imageUrl,
+      status,
     } = req.body;
 
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
     if (!userId || !characterId || !projectId) {
       res.status(400).json({ error: "Missing user, project or character id" });
-      return;
-    }
-
-    const isOwner = await isProjectOwner(projectId, userId);
-    if (!isOwner) {
-      res
-        .status(403)
-        .json({ error: "User is not authorized to create a character" });
       return;
     }
 
     const character = await db
       .select()
       .from(characters)
-      .where(eq(characters.characterId, characterId));
+      .where(eq(characters.id, characterId));
 
     if (character.length === 0) {
       res.status(404).json({ error: "Character not found" });
@@ -152,33 +138,33 @@ export const updateCharacter = async (
     }
 
     type CharacterUpdate = {
-      characterName?: string;
-      characterDescription?: string;
-      characterHistory?: string;
-      characterpsychologicalProfile?: string;
-      characterRelationships?: string;
-      characterImageUrl?: string;
-      characterStatus?: boolean;
+      name?: string;
+      description?: string;
+      age?: number;
+      history?: string;
+      psychologicalProfile?: string;
+      relationships?: string;
+      imageUrl?: string;
+      status?: boolean;
       updatedAt?: Date;
     };
 
     const updates: CharacterUpdate = {};
-    if (characterName) updates.characterName = characterName;
-    if (characterDescription)
-      updates.characterDescription = characterDescription;
-    if (characterHistory) updates.characterHistory = characterHistory;
-    if (characterpsychologicalProfile)
-      updates.characterpsychologicalProfile = characterpsychologicalProfile;
-    if (characterRelationships)
-      updates.characterRelationships = characterRelationships;
-    if (characterImageUrl) updates.characterImageUrl = characterImageUrl;
-    if (characterStatus) updates.characterStatus = characterStatus;
+    if (name) updates.name = name;
+    if (description) updates.description = description;
+    if (history) updates.history = history;
+    if (psychologicalProfile)
+      updates.psychologicalProfile = psychologicalProfile;
+    if (relationships) updates.relationships = relationships;
+    if (imageUrl) updates.imageUrl = imageUrl;
+    if (status) updates.status = status;
+    if (age) updates.age = age;
     updates.updatedAt = new Date();
 
     await db
       .update(characters)
       .set(updates)
-      .where(eq(characters.characterId, characterId));
+      .where(eq(characters.id, characterId));
     res
       .status(200)
       .json({ message: "Character updated successfully", updates });
@@ -195,32 +181,24 @@ export const deleteCharacter = async (
   try {
     const { characterId, projectId } = req.params;
 
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
 
     if (!userId || !characterId || !projectId) {
       res.status(400).json({ error: "Missing user, project or character id" });
       return;
     }
 
-    const isOwner = await isProjectOwner(projectId, userId);
-    if (!isOwner) {
-      res
-        .status(403)
-        .json({ error: "User is not authorized to delete a character" });
-      return;
-    }
-
     const character = await db
       .select()
       .from(characters)
-      .where(eq(characters.characterId, characterId));
+      .where(eq(characters.id, characterId));
 
     if (character.length === 0) {
       res.status(404).json({ error: "Character not found" });
       return;
     }
 
-    await db.delete(characters).where(eq(characters.characterId, characterId));
+    await db.delete(characters).where(eq(characters.id, characterId));
 
     res.status(200).json({ message: "Character deleted successfully" });
   } catch (error) {

@@ -1,0 +1,43 @@
+@use "../abstracts/variables" as variables;
+@use "../abstracts/typographies" as typo;
+
+.selector {
+  position: relative;
+  margin-block: 1rem;
+
+  &__button {
+    width: 90vw;
+    padding: 0.75rem 1.5rem;
+    border-radius: variables.$border-radius;
+    box-shadow: variables.$shadow-base;
+    font-size: typo.$font-size-base;
+    border: none;
+    transition: variables.$transiton;
+    background-color: theme(primary);
+    color: theme(text);
+    cursor: pointer;
+  }
+
+  &:hover {
+    .selector__button {
+      background-color: theme(hover);
+    }
+  }
+
+  &__options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white; // theme(secondary);
+    color: theme(text);
+    border: none;
+    box-sizing: border-box;
+    z-index: 1;
+
+    li {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+    }
+  }
+}

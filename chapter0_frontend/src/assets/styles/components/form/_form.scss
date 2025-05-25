@@ -1,0 +1,16 @@
+@use "../../abstracts/variables" as variables;
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  &__button {
+    width: 90%;
+    padding: 0.5rem;
+    box-shadow: variables.$shadow-base;
+    border-radius: variables.$border-radius;
+    border: none;
+  }
+}

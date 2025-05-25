@@ -2,7 +2,6 @@ import { Response } from "express";
 import { eq } from "drizzle-orm";
 import { chapters, db } from "../db";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
-import { isProjectOwner } from "../utils/isOwner";
 
 export const createChapter = async (
   req: AuthenticatedRequest,
@@ -10,29 +9,15 @@ export const createChapter = async (
 ): Promise<void> => {
   try {
     const { projectId } = req.params;
-    const {
-      chapterTitle,
-      chapterNumber,
-      chapterContent,
-      chapterVersion,
-      chapterStatus,
-    } = req.body;
+    const { name, number, content, version, status } = req.body;
 
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
     if (!userId || !projectId) {
       res.status(400).json({ error: "Missing user or project id" });
       return;
     }
 
-    const isOwner = await isProjectOwner(projectId, userId);
-    if (!isOwner) {
-      res
-        .status(403)
-        .json({ error: "User is not authorized to create a chapter" });
-      return;
-    }
-
-    if (!chapterTitle) {
+    if (!name) {
       res.status(400).json({ error: "Missing required fields" });
       return;
     }
@@ -41,16 +26,17 @@ export const createChapter = async (
       .insert(chapters)
       .values({
         projectId,
-        chapterTitle,
-        chapterNumber,
-        chapterContent,
-        chapterVersion,
-        chapterStatus,
+        name,
+        number,
+        content,
+        version,
+        status,
       })
       .returning();
 
     res.status(201).json({ message: "Chapter created successfully", chapter });
   } catch (error) {
+    console.error("Erreur d'insertion chapitre :", error);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -70,13 +56,13 @@ export const getChapterById = async (
     const chapter = await db
       .select()
       .from(chapters)
-      .where(eq(chapters.chapterId, chapterId));
+      .where(eq(chapters.id, chapterId));
 
     if (chapter.length === 0) {
       res.status(404).json({ error: "Chapter not found" });
     }
 
-    res.status(200).json(chapter[0]);
+    res.status(200).json(chapter);
   } catch (error) {
     console.error("Error fetching chapter:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -111,32 +97,18 @@ export const updateChapter = async (
 ): Promise<void> => {
   try {
     const { chapterId, projectId } = req.params;
-    const {
-      chapterTitle,
-      chapterNumber,
-      chapterContent,
-      chapterVersion,
-      chapterStatus,
-    } = req.body;
+    const { name, number, content, version, status } = req.body;
 
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
     if (!userId || !chapterId || !projectId) {
       res.status(400).json({ error: "Missing user, project or chapter id" });
-      return;
-    }
-
-    const isOwner = await isProjectOwner(projectId, userId);
-    if (!isOwner) {
-      res
-        .status(403)
-        .json({ error: "User is not authorized to create a chapter" });
       return;
     }
 
     const chapter = await db
       .select()
       .from(chapters)
-      .where(eq(chapters.chapterId, chapterId));
+      .where(eq(chapters.id, chapterId));
 
     if (chapter.length === 0) {
       res.status(404).json({ error: "Chapter not found" });
@@ -144,26 +116,23 @@ export const updateChapter = async (
     }
 
     type ChapterUpdate = {
-      chapterTitle?: string;
-      chapterNumber?: number;
-      chapterContent?: string;
-      chapterVersion?: number;
-      chapterStatus?: boolean;
+      name?: string;
+      number?: number;
+      content?: string;
+      version?: number;
+      status?: boolean;
       updatedAt?: Date;
     };
 
     const updates: ChapterUpdate = {};
-    if (chapterTitle) updates.chapterTitle = chapterTitle;
-    if (chapterNumber) updates.chapterNumber = chapterNumber;
-    if (chapterContent) updates.chapterContent = chapterContent;
-    if (chapterVersion) updates.chapterVersion = chapterVersion;
-    if (chapterStatus) updates.chapterStatus = chapterStatus;
+    if (name) updates.name = name;
+    if (number) updates.number = number;
+    if (content) updates.content = content;
+    if (version) updates.version = version;
+    if (status) updates.status = status;
     updates.updatedAt = new Date();
 
-    await db
-      .update(chapters)
-      .set(updates)
-      .where(eq(chapters.chapterId, chapterId));
+    await db.update(chapters).set(updates).where(eq(chapters.id, chapterId));
     res.status(200).json({ message: "Chapter updated successfully", updates });
   } catch (error) {
     console.error("Error updating chapter:", error);
@@ -178,32 +147,24 @@ export const deleteChapter = async (
   try {
     const { chapterId, projectId } = req.params;
 
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
 
     if (!userId || !chapterId || !projectId) {
       res.status(400).json({ error: "Missing user, project or chapter id" });
       return;
     }
 
-    const isOwner = await isProjectOwner(projectId, userId);
-    if (!isOwner) {
-      res
-        .status(403)
-        .json({ error: "User is not authorized to delete a chapter" });
-      return;
-    }
-
     const chapter = await db
       .select()
       .from(chapters)
-      .where(eq(chapters.chapterId, chapterId));
+      .where(eq(chapters.id, chapterId));
 
     if (chapter.length === 0) {
       res.status(404).json({ error: "Chapter not found" });
       return;
     }
 
-    await db.delete(chapters).where(eq(chapters.chapterId, chapterId));
+    await db.delete(chapters).where(eq(chapters.id, chapterId));
 
     res.status(200).json({ message: "Chapter deleted successfully" });
   } catch (error) {

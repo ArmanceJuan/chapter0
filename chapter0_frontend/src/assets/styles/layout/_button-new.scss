@@ -1,0 +1,39 @@
+@use "../abstracts/variables" as variables;
+@use "../abstracts/typographies" as typo;
+
+.button-new {
+  position: fixed;
+  width: 4rem;
+  height: 4rem;
+  bottom: 5rem;
+  right: 1rem;
+  border-radius: 50%;
+  border: none;
+  background-color: grey;
+}
+
+.button-new-menu {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  background-color: grey;
+
+  border-radius: variables.$border-radius;
+  height: 27rem;
+  width: 15rem;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  &__item {
+    text-align: left;
+    border: none;
+    cursor: pointer;
+    background-color: grey;
+    padding: 1rem 2rem;
+
+    &:hover {
+      background-color: lightblue;
+    }
+  }
+}

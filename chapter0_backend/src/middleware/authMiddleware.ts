@@ -7,11 +7,13 @@ const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export interface AuthenticatedRequest extends Request {
   user?: {
-    userId: string;
+    id: string;
     email: string;
     username: string;
+    isAdmin: boolean;
   };
 }
+
 export const authMiddleware = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -29,16 +31,17 @@ export const authMiddleware = async (
   const token = authToken.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
 
     const user = await db
       .select({
-        userId: users.userId,
+        id: users.id,
         email: users.email,
         username: users.username,
+        isAdmin: users.isAdmin,
       })
       .from(users)
-      .where(eq(users.userId, decoded.userId));
+      .where(eq(users.id, decoded.id));
 
     if (user.length === 0) {
       res.status(401).json({ message: "User not found" });

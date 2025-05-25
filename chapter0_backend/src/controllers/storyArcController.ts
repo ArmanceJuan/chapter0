@@ -1,7 +1,6 @@
 import { Response } from "express";
 import { eq } from "drizzle-orm";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
-import { isProjectOwner } from "../utils/isOwner";
 import { db, storyArcs } from "../db";
 
 export const createStoryArc = async (
@@ -10,24 +9,19 @@ export const createStoryArc = async (
 ): Promise<void> => {
   try {
     const { projectId } = req.params;
-    const { storyArcTitle, storyArcDescription, linkedArcs, storyArcStatus } =
-      req.body;
+    const { name, description, linkedArcs, imageUrl, status } = req.body;
 
-    const userId = req.user?.userId;
+    console.log("body reçu :", req.body);
+
+    const userId = req.user?.id;
     if (!userId || !projectId) {
+      console.log("userId ou projectId null");
       res.status(400).json({ error: "Missing user or project id" });
       return;
     }
 
-    const isOwner = await isProjectOwner(projectId, userId);
-    if (!isOwner) {
-      res
-        .status(403)
-        .json({ error: "User is not authorized to create a story arc" });
-      return;
-    }
-
-    if (!storyArcTitle) {
+    if (!name) {
+      console.log("name null");
       res.status(400).json({ error: "Missing required fields" });
       return;
     }
@@ -36,12 +30,15 @@ export const createStoryArc = async (
       .insert(storyArcs)
       .values({
         projectId,
-        storyArcTitle,
-        storyArcDescription,
+        name,
+        description,
         linkedArcs,
-        storyArcStatus,
+        imageUrl,
+        status,
       })
       .returning();
+
+    console.log("body reçu :", req.body);
 
     res
       .status(201)
@@ -66,13 +63,13 @@ export const getStoryArcById = async (
     const storyArc = await db
       .select()
       .from(storyArcs)
-      .where(eq(storyArcs.storyArcId, storyArcId));
+      .where(eq(storyArcs.id, storyArcId));
 
     if (storyArc.length === 0) {
       res.status(404).json({ error: "StoryArc not found" });
     }
 
-    res.status(200).json(storyArc[0]);
+    res.status(200).json(storyArc);
   } catch (error) {
     console.error("Error fetching story arc:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -107,27 +104,24 @@ export const updateStoryArc = async (
 ): Promise<void> => {
   try {
     const { storyArcId, projectId } = req.params;
-    const { storyArcTitle, storyArcDescription, linkedArcs, storyArcStatus } =
-      req.body;
+    const {
+      storyArcTitle,
+      storyArcDescription,
+      storyArcStatus,
+      linkedArcs,
+      imageUrl,
+    } = req.body;
 
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
     if (!userId || !storyArcId || !projectId) {
       res.status(400).json({ error: "Missing user, project or story arc id" });
-      return;
-    }
-
-    const isOwner = await isProjectOwner(projectId, userId);
-    if (!isOwner) {
-      res
-        .status(403)
-        .json({ error: "User is not authorized to create a story arc" });
       return;
     }
 
     const storyArc = await db
       .select()
       .from(storyArcs)
-      .where(eq(storyArcs.storyArcId, storyArcId));
+      .where(eq(storyArcs.id, storyArcId));
 
     if (storyArc.length === 0) {
       res.status(404).json({ error: "StoryArc not found" });
@@ -138,6 +132,8 @@ export const updateStoryArc = async (
       storyArcTitle?: string;
       storyArcDescription?: string;
       storyArcStatus?: boolean;
+      linkedArcs?: string;
+      imageUrl?: string;
       updatedAt?: Date;
     };
 
@@ -146,11 +142,10 @@ export const updateStoryArc = async (
     if (storyArcDescription) updates.storyArcDescription = storyArcDescription;
     if (storyArcStatus) updates.storyArcStatus = storyArcStatus;
     updates.updatedAt = new Date();
+    if (linkedArcs) updates.linkedArcs = linkedArcs;
+    if (imageUrl) updates.imageUrl = imageUrl;
 
-    await db
-      .update(storyArcs)
-      .set(updates)
-      .where(eq(storyArcs.storyArcId, storyArcId));
+    await db.update(storyArcs).set(updates).where(eq(storyArcs.id, storyArcId));
     res.status(200).json({ message: "StoryArc updated successfully", updates });
   } catch (error) {
     console.error("Error updating story arc:", error);
@@ -165,32 +160,24 @@ export const deleteStoryArc = async (
   try {
     const { storyArcId, projectId } = req.params;
 
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
 
     if (!userId || !storyArcId || !projectId) {
       res.status(400).json({ error: "Missing user, project or story arc id" });
       return;
     }
 
-    const isOwner = await isProjectOwner(projectId, userId);
-    if (!isOwner) {
-      res
-        .status(403)
-        .json({ error: "User is not authorized to delete a sory arc" });
-      return;
-    }
-
     const storyArc = await db
       .select()
       .from(storyArcs)
-      .where(eq(storyArcs.storyArcId, storyArcId));
+      .where(eq(storyArcs.id, storyArcId));
 
     if (storyArc.length === 0) {
       res.status(404).json({ error: "StoryArc not found" });
       return;
     }
 
-    await db.delete(storyArcs).where(eq(storyArcs.storyArcId, storyArcId));
+    await db.delete(storyArcs).where(eq(storyArcs.id, storyArcId));
 
     res.status(200).json({ message: "StoryArc deleted successfully" });
   } catch (error) {

@@ -1,27 +1,31 @@
 import { useState } from "react";
-import AuthenticateButton from "../atoms/Button/AuthenticateButton";
-import LoginForm from "../organisms/Form/LoginForm";
-import RegisterForm from "../organisms/Form/RegisterForm";
+import LoginForm from "../molecules/forms/LoginForm";
+import RegisterForm from "../molecules/forms/RegisterForm";
+import Button from "../atoms/buttons/Button";
 
 const Authenticate = () => {
   const [mode, setMode] = useState<"login" | "register">("login");
   return (
-    <section>
-      <div>
-        <AuthenticateButton
-          className={mode === "login" ? "active" : ""}
+    <section className="auth-form-container">
+      <div className="auth-form-container__tabs">
+        <Button
+          className={`auth-form-container__tabs_button ${
+            mode === "login" ? "auth-form-container__tabs_active" : ""
+          }`}
           onClick={() => setMode("login")}
         >
           Connexion
-        </AuthenticateButton>
-        <AuthenticateButton
-          className={mode === "register" ? "active" : ""}
+        </Button>
+        <Button
+          className={`auth-form-container__tabs_button ${
+            mode === "register" ? "auth-form-container__tabs_active" : ""
+          }`}
           onClick={() => setMode("register")}
         >
           Inscription
-        </AuthenticateButton>
+        </Button>
       </div>
-      <div>{mode === "login" ? <LoginForm /> : <RegisterForm />}</div>
+      {mode === "login" ? <LoginForm /> : <RegisterForm />}
     </section>
   );
 };

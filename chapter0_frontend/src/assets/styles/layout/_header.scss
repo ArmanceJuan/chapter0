@@ -1,0 +1,25 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100vw;
+  height: 4rem;
+  background-color: #f9f8f8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  box-sizing: border-box;
+
+  .logo {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  &__logout {
+    padding-inline: 1rem;
+    font-size: 2rem;
+    display: inline-block;
+  }
+}

@@ -7,17 +7,25 @@ import {
   boolean,
 } from "drizzle-orm/pg-core";
 import { projects } from "./projects";
+import { relations } from "drizzle-orm";
 
 export const chapters = pgTable("chapters", {
-  chapterId: uuid("chapter_id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   projectId: uuid("project_id")
     .notNull()
-    .references(() => projects.projectId),
-  chapterTitle: text("chapter_title").notNull(),
-  chapterNumber: integer("chapter_number").notNull(),
-  chapterContent: text("chapter_content"),
-  chapterVersion: integer("chapter_version").notNull(),
-  chapterStatus: boolean("chapter_status").default(false),
+    .references(() => projects.id),
+  name: text("name").notNull(),
+  number: integer("number").notNull(),
+  content: text("content"),
+  version: integer("version").notNull(),
+  status: boolean("status").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const chaptersRelations = relations(chapters, ({ one }) => ({
+  project: one(projects, {
+    fields: [chapters.projectId],
+    references: [projects.id],
+  }),
+}));

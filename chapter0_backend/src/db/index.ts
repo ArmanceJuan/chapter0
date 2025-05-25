@@ -17,4 +17,9 @@ export const {
   characters,
   places,
   storyArcs,
+  invitations,
+  comments,
+  notifications,
+  notes,
+  chapterVersions,
 } = schema;

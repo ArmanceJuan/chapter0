@@ -3,15 +3,16 @@ import { users } from "./users";
 import { projects } from "./projects";
 
 export const notifications = pgTable("notifications", {
-  notificationId: uuid("notification_id").primaryKey().defaultRandom(),
+  type: text("type").notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
-    .references(() => users.userId),
+    .references(() => users.id),
   projectId: uuid("project_id")
     .notNull()
-    .references(() => projects.projectId),
-  notificationContent: text("notification_content").notNull(),
-  notificationRead: boolean("notification_read").default(false),
-  notificationCreatedAt: timestamp("notification_created_at").defaultNow(),
-  notificationUpdatedAt: timestamp("notification_updated_at").defaultNow(),
+    .references(() => projects.id),
+  content: text("content").notNull(),
+  read: boolean("read").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });

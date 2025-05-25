@@ -1,33 +1,56 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { eq } from "drizzle-orm";
-import { db, projects } from "../db";
+import { db, projects, projectUsers } from "../db";
 
 export const createProject = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
   try {
-    const { title, description } = req.body;
-    const ownerId = req.user?.userId;
+    const { name, description } = req.body;
+    const ownerId = req.user?.id;
 
     if (!ownerId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    if (!title) {
+    if (!name) {
       res.status(400).json({ error: "Missing required fields" });
       return;
     }
 
     const project = await db
       .insert(projects)
-      .values({ title, description, ownerId })
+      .values({ name, description, ownerId, ownerName: req.user?.username })
       .returning();
+
+    await db
+      .insert(projectUsers)
+      .values({ projectId: project[0].id, userId: ownerId, role: "owner" });
+
+    console.log("req.user", req.user);
 
     res.status(201).json({ message: "Project created successfully", project });
   } catch (error: any) {
     console.error("Error creating project:", error.message);
+  }
+};
+
+export const getAllProjects = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  if (!req.user?.isAdmin) {
+    res.status(403).json({ error: "Forbidden : Your are not an admin" });
+    return;
+  }
+  try {
+    const allProjects = await db.select().from(projects).orderBy(projects.name);
+    res.status(200).json(allProjects);
+  } catch (error) {
+    console.error("Error fetching projects:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -40,7 +63,7 @@ export const getProjectById = async (
     const project = await db
       .select()
       .from(projects)
-      .where(eq(projects.projectId, projectId));
+      .where(eq(projects.id, projectId));
     if (project.length === 0) {
       res.status(404).json({ error: "Project not found" });
     }
@@ -57,37 +80,34 @@ export const updateProject = async (
 ) => {
   try {
     const { projectId } = req.params;
-    const { title, description } = req.body;
+    const { name, description } = req.body;
 
     const project = await db
       .select()
       .from(projects)
-      .where(eq(projects.projectId, projectId));
+      .where(eq(projects.id, projectId));
 
     if (project.length === 0) {
       res.status(404).json({ error: "Project not found" });
       return;
     }
-    if (project[0].ownerId !== req.user?.userId) {
+    if (project[0].ownerId !== req.user?.id) {
       res.status(403).json({ error: "Forbidden : It's not your account" });
       return;
     }
 
     type ProjectUpdate = {
-      title?: string;
+      name?: string;
       description?: string;
       updatedAt?: Date;
     };
 
     const updates: ProjectUpdate = {};
-    if (title) updates.title = title;
+    if (name) updates.name = name;
     if (description) updates.description = description;
     updates.updatedAt = new Date();
 
-    await db
-      .update(projects)
-      .set(updates)
-      .where(eq(projects.projectId, projectId));
+    await db.update(projects).set(updates).where(eq(projects.id, projectId));
 
     res.status(200).json({ message: "Project updated successfully" });
   } catch (error) {
@@ -105,18 +125,18 @@ export const deleteProject = async (
     const project = await db
       .select()
       .from(projects)
-      .where(eq(projects.projectId, projectId));
+      .where(eq(projects.id, projectId));
 
     if (project.length === 0) {
       res.status(404).json({ error: "Project not found" });
       return;
     }
-    if (project[0].ownerId !== req.user?.userId) {
+    if (project[0].ownerId !== req.user?.id) {
       res.status(403).json({ error: "Forbidden : It's not your account" });
       return;
     }
 
-    await db.delete(projects).where(eq(projects.projectId, projectId));
+    await db.delete(projects).where(eq(projects.id, projectId));
 
     res.status(200).json({ message: "Project deleted successfully" });
   } catch (error) {

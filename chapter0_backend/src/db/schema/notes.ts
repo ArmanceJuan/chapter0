@@ -3,14 +3,14 @@ import { users } from "./users";
 import { projects } from "./projects";
 
 export const notes = pgTable("notes", {
-  noteId: uuid("note_id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
-    .references(() => users.userId),
+    .references(() => users.id),
   projectId: uuid("project_id")
     .notNull()
-    .references(() => projects.projectId),
-  noteContent: text("note_content").notNull(),
-  noteCreatedAt: timestamp("note_created_at").defaultNow(),
-  noteUpdatedAt: timestamp("note_updated_at").defaultNow(),
+    .references(() => projects.id),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });

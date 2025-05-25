@@ -1,15 +1,24 @@
 import { pgTable, uuid, text, timestamp, boolean } from "drizzle-orm/pg-core";
 import { projects } from "./projects";
+import { relations } from "drizzle-orm";
 
 export const storyArcs = pgTable("story_arcs", {
-  storyArcId: uuid("story_arc_id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
   projectId: uuid("project_id")
     .notNull()
-    .references(() => projects.projectId),
-  storyArcTitle: text("story_arc_title").notNull(),
-  storyArcDescription: text("story_arc_description"),
+    .references(() => projects.id),
+  name: text("name").notNull(),
+  description: text("description"),
   linkedArcs: text("linked_arcs"),
-  storyArcStatus: boolean("story_arc_status").default(false),
+  status: boolean("status").default(true),
+  imageUrl: text("image_url"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const storyArcsRelations = relations(storyArcs, ({ one }) => ({
+  project: one(projects, {
+    fields: [storyArcs.projectId],
+    references: [projects.id],
+  }),
+}));

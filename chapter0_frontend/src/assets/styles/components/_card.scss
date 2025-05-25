@@ -1,0 +1,21 @@
+@use "../abstracts/variables" as variables;
+@use "../abstracts/typographies" as typo;
+
+.card {
+  background-color: white; // theme(primary);
+  box-sizing: border-box;
+  border-radius: variables.$border-radius;
+  box-shadow: variables.$shadow-base;
+
+  h2 {
+    display: flex;
+    justify-content: center;
+    font-size: typo.$font-size-h3;
+    font-weight: bold;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+}
