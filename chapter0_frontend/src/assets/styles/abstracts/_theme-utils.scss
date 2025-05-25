@@ -1,7 +1,7 @@
-@use "./themes" as *;
 @use "sass:map";
+@use "./themes" as *;
 
-@function theme-color($key, $theme-name: $themeDefault) {
+@function theme-color($key, $theme-name: default) {
   $themes: (
     default: $themeDefault,
     aurore: $themeAurore,
@@ -9,22 +9,25 @@
     golden-hour: $themeGoldenHour,
     midnight: $themeMidnight,
   );
-  @return map.get($themes, $theme-name), $key;
+
+  $theme-map: map.get($themes, $theme-name);
+  @return map.get($theme-map, $key);
 }
 
 @each $name,
   $theme
     in (
-      "default": $themeDefault,
-      "aurore": $themeAurore,
-      "zenith": $themeZenith,
-      "golden-hour": $themeGoldenHour,
-      "midnight": $themeMidnight
+      default: $themeDefault,
+      aurore: $themeAurore,
+      zenith: $themeZenith,
+      golden-hour: $themeGoldenHour,
+      midnight: $themeMidnight
     )
 {
   [data-theme="#{$name}"] {
     background-color: map.get($theme, background);
-    color: map.get($theme, text);
+    color: map.get($theme, text-light);
+
     h1,
     h2,
     h3,
@@ -32,6 +35,13 @@
     h5,
     h6 {
       color: map.get($theme, heading);
+    }
+
+    .button {
+      background-color: map.get($theme, primary);
+      &:hover {
+        background-color: map.get($theme, hover);
+      }
     }
   }
 }

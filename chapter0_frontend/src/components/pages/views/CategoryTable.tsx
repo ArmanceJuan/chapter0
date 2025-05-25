@@ -85,6 +85,8 @@ const CategoryTable = ({ category }: Props) => {
                       <ButtonAction
                         variant="delete"
                         projectId={projectId || ""}
+                        category={category}
+                        id={item.id}
                       />
                     </div>
                   )}

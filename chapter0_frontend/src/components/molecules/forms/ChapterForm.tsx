@@ -98,7 +98,7 @@ const ChapterForm = ({ isEdit }: Props) => {
         children="Contenu du chapitre"
         onChange={(e) => setContent(e.target.value)}
       />
-      <button type="submit" className="form-container__button">
+      <button type="submit" className="button">
         {isEdit ? "Editer" : "Créer"}
       </button>
     </form>

@@ -2,6 +2,8 @@ import { Response } from "express";
 import { eq } from "drizzle-orm";
 import { chapters, db } from "../db";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
+import { sanitizeChapter } from "../lib/security/sanitation/sanitizeChapter";
+import { validateChapter } from "../lib/security/validation/validateChapter";
 
 export const createChapter = async (
   req: AuthenticatedRequest,
@@ -22,15 +24,24 @@ export const createChapter = async (
       return;
     }
 
+    validateChapter({ name, number, content, version, status });
+    const sanitizedData = sanitizeChapter({
+      name,
+      number,
+      content,
+      version,
+      status,
+    });
+
     const chapter = await db
       .insert(chapters)
       .values({
         projectId,
-        name,
-        number,
-        content,
-        version,
-        status,
+        name: sanitizedData.name,
+        number: Number(sanitizedData.number),
+        content: sanitizedData.content,
+        version: Number(sanitizedData.version),
+        status: Boolean(sanitizedData.status),
       })
       .returning();
 
@@ -132,7 +143,24 @@ export const updateChapter = async (
     if (status) updates.status = status;
     updates.updatedAt = new Date();
 
-    await db.update(chapters).set(updates).where(eq(chapters.id, chapterId));
+    validateChapter({ name, number, content, version, status });
+    const sanitizedData = sanitizeChapter({
+      name,
+      number,
+      content,
+      version,
+      status,
+    });
+    await db
+      .update(chapters)
+      .set({
+        name: sanitizedData.name,
+        number: Number(sanitizedData.number),
+        content: sanitizedData.content,
+        version: Number(sanitizedData.version),
+        status: Boolean(sanitizedData.status),
+      })
+      .where(eq(chapters.id, chapterId));
     res.status(200).json({ message: "Chapter updated successfully", updates });
   } catch (error) {
     console.error("Error updating chapter:", error);

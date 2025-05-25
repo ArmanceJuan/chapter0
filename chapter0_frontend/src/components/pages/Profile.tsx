@@ -15,7 +15,7 @@ const Profile = () => {
   }
   return (
     <div className="content-container">
-      <div>
+      <div className="user-profile">
         <h1>Profile</h1>
         <ButtonAction variant="edit" category="profile" id={user?.id} />
       </div>

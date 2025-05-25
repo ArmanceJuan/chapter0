@@ -93,7 +93,7 @@ const StoryArcForm = ({ isEdit }: Props) => {
         children="Image de l'arc narratif"
         onChange={(e) => setImageUrl(e.target.value)}
       />
-      <button type="submit" className="form-container__button">
+      <button type="submit" className="button">
         {isEdit ? "Editer" : "Créer"}
       </button>
     </form>

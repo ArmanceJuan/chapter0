@@ -104,7 +104,7 @@ const PlaceForm = ({ isEdit }: Props) => {
         children="Image du lieu"
         onChange={(e) => setImageUrl(e.target.value)}
       />
-      <button type="submit" className="form-container__button">
+      <button type="submit" className="button">
         {isEdit ? "Editer" : "Créer"}
       </button>
     </form>

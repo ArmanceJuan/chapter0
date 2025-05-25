@@ -1,17 +1,22 @@
 @use "../abstracts/variables" as variables;
 @use "../abstracts/typographies" as typo;
+@use "../abstracts/theme-utils" as *;
+@use "../abstracts/breakpoints";
 
 .card {
-  background-color: white; // theme(primary);
+  background-color: theme-color(secondary);
+  color: theme-color(text-light);
   box-sizing: border-box;
   border-radius: variables.$border-radius;
   box-shadow: variables.$shadow-base;
+  height: 3rem;
 
   h2 {
     display: flex;
     justify-content: center;
     font-size: typo.$font-size-h3;
     font-weight: bold;
+    color: theme-color(text-light);
   }
 
   ul {

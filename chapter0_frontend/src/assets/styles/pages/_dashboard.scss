@@ -1,3 +1,15 @@
+@use "../abstracts/typographies" as typo;
+@use "../abstracts/theme-utils" as *;
+@use "../abstracts/variables" as variables;
+
+.content-container {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+}
+
 .project-infos {
   width: 100vw;
   display: flex;
@@ -5,6 +17,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
+
+  h1 {
+    font-size: typo.$font-size-h1;
+    font-weight: bold;
+    color: theme-color(primary);
+  }
 
   &__actions {
     align-items: center;

@@ -83,7 +83,7 @@ const CharacterForm = ({ isEdit }: Props) => {
     }
   };
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="form-container">
       <Input
         type="text"
         placeholder="Nom"
@@ -136,7 +136,9 @@ const CharacterForm = ({ isEdit }: Props) => {
         children="Image pour le personnage"
         onChange={(e) => setImageUrl(e.target.value)}
       />
-      <button type="submit">{isEdit ? "Editer" : "Créer"}</button>
+      <button type="submit" className="button">
+        {isEdit ? "Editer" : "Créer"}
+      </button>
     </form>
   );
 };

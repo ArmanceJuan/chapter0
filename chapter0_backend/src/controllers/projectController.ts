@@ -2,6 +2,8 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { eq } from "drizzle-orm";
 import { db, projects, projectUsers } from "../db";
+import { sanitizeProject } from "../lib/security/sanitation/sanitizeProject";
+import { validateProject } from "../lib/security/validation/validationProject";
 
 export const createProject = async (
   req: AuthenticatedRequest,
@@ -20,9 +22,17 @@ export const createProject = async (
       return;
     }
 
+    validateProject({ name, description });
+    const sanitizedData = sanitizeProject({ name, description });
+
     const project = await db
       .insert(projects)
-      .values({ name, description, ownerId, ownerName: req.user?.username })
+      .values({
+        name: sanitizedData.name,
+        description: sanitizedData.description,
+        ownerId,
+        ownerName: req.user?.username,
+      })
       .returning();
 
     await db
@@ -107,7 +117,16 @@ export const updateProject = async (
     if (description) updates.description = description;
     updates.updatedAt = new Date();
 
-    await db.update(projects).set(updates).where(eq(projects.id, projectId));
+    validateProject({ name, description });
+    const sanitizedData = sanitizeProject({ name, description });
+    await db
+      .update(projects)
+      .set({
+        name: sanitizedData.name,
+        description: sanitizedData.description,
+        updatedAt: new Date(),
+      })
+      .where(eq(projects.id, projectId));
 
     res.status(200).json({ message: "Project updated successfully" });
   } catch (error) {

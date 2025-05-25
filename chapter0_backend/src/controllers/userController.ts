@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
+import { sanitizeData } from "../lib/security/sanitation/sanitizeUser";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -18,10 +19,14 @@ export const createUser = async (
       return;
     }
 
+    validateUser({ email, username, password });
+    const sanitized = sanitizeData({ email, username, password });
+
     const existingUser = await db
       .select()
       .from(users)
-      .where(eq(users.email, email));
+      .where(eq(users.email, sanitized.email));
+
     if (existingUser.length > 0) {
       res.status(400).json({ error: "Email already exists" });
       return;
@@ -31,7 +36,12 @@ export const createUser = async (
 
     const newUser = await db
       .insert(users)
-      .values({ email, username, password: hashedPassword, isAdmin })
+      .values({
+        email: sanitized.email,
+        username: sanitized.username,
+        password: hashedPassword,
+        isAdmin,
+      })
       .returning();
     const createdUser = newUser[0];
 
@@ -111,10 +121,6 @@ export const updateUser = async (
   const id = req.params.id || req.params.userId;
   const { email, username, password, currentPassword } = req.body;
   try {
-    console.log("req.user.id controller =", id);
-    console.log("req.user.id =", req.user?.id);
-    console.log("req.params.id =", req.params.id);
-
     const user = await db.select().from(users).where(eq(users.id, id));
 
     if (!req.user || req.user.id !== id) {
@@ -341,3 +347,6 @@ export const getMe = async (
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+function validateUser(arg0: { email: any; username: any; password: any }) {
+  throw new Error("Function not implemented.");
+}

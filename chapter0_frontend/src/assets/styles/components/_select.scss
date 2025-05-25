@@ -1,5 +1,6 @@
 @use "../abstracts/variables" as variables;
 @use "../abstracts/typographies" as typo;
+@use "../abstracts/theme-utils" as *;
 
 .selector {
   position: relative;
@@ -13,8 +14,8 @@
     font-size: typo.$font-size-base;
     border: none;
     transition: variables.$transiton;
-    background-color: theme(primary);
-    color: theme(text);
+    background-color: theme-color(primary);
+    color: theme-color(text-light);
     cursor: pointer;
   }
 
@@ -29,8 +30,8 @@
     top: 100%;
     left: 0;
     width: 100%;
-    background-color: white; // theme(secondary);
-    color: theme(text);
+    background-color: theme-color(hover);
+    color: theme-color(text-dark);
     border: none;
     box-sizing: border-box;
     z-index: 1;

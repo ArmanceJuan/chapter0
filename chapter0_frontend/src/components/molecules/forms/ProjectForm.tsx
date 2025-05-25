@@ -74,7 +74,7 @@ const ProjectForm = ({ isEdit }: Props) => {
         children="Description du projet"
         onChange={(e) => setDescription(e.target.value)}
       />
-      <button type="submit" className="form-container__button">
+      <button type="submit" className="button">
         {isEdit ? "Editer" : "Créer"}
       </button>
     </form>

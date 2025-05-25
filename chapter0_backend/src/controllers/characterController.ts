@@ -2,6 +2,8 @@ import { Response } from "express";
 import { eq } from "drizzle-orm";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { db, characters } from "../db";
+import { validateCharacter } from "../lib/security/validation/validateCharacter";
+import { sanitizeCharacter } from "../lib/security/sanitation/sanitizeCharacter";
 
 export const createCharacter = async (
   req: AuthenticatedRequest,
@@ -31,18 +33,39 @@ export const createCharacter = async (
       return;
     }
 
+    validateCharacter({
+      name,
+      age,
+      description,
+      history,
+      psychologicalProfile,
+      relationships,
+      imageUrl,
+      status,
+    });
+    const sanitizedData = sanitizeCharacter({
+      name,
+      age,
+      description,
+      history,
+      psychologicalProfile,
+      relationships,
+      imageUrl,
+      status,
+    });
+
     const character = await db
       .insert(characters)
       .values({
         projectId,
-        name,
-        age,
-        description,
-        history,
-        psychologicalProfile,
-        relationships,
-        imageUrl,
-        status,
+        name: sanitizedData.name,
+        age: sanitizedData.age,
+        description: sanitizedData.description,
+        history: sanitizedData.history,
+        psychologicalProfile: sanitizedData.psychologicalProfile,
+        relationships: sanitizedData.relationships,
+        imageUrl: sanitizedData.imageUrl,
+        status: sanitizedData.status,
       })
       .returning();
 
@@ -161,9 +184,40 @@ export const updateCharacter = async (
     if (age) updates.age = age;
     updates.updatedAt = new Date();
 
+    validateCharacter({
+      name,
+      age,
+      description,
+      history,
+      psychologicalProfile,
+      relationships,
+      imageUrl,
+      status,
+    });
+    const sanitizedData = sanitizeCharacter({
+      name,
+      age,
+      description,
+      history,
+      psychologicalProfile,
+      relationships,
+      imageUrl,
+      status,
+    });
+
     await db
       .update(characters)
-      .set(updates)
+      .set({
+        name: sanitizedData.name,
+        age: sanitizedData.age,
+        description: sanitizedData.description,
+        history: sanitizedData.history,
+        psychologicalProfile: sanitizedData.psychologicalProfile,
+        relationships: sanitizedData.relationships,
+        imageUrl: sanitizedData.imageUrl,
+        status: sanitizedData.status,
+        updatedAt: new Date(),
+      })
       .where(eq(characters.id, characterId));
     res
       .status(200)

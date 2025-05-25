@@ -1,5 +1,6 @@
 @use "../abstracts/variables" as variables;
 @use "../abstracts/typographies" as typo;
+@use "../abstracts/theme-utils" as *;
 
 .button {
   padding: 0.75rem 1.5rem;
@@ -8,15 +9,97 @@
   border: none;
   margin: 0.5rem;
   transition: variables.$transiton;
-  background-color: theme(primary);
-  color: theme(text);
+  background-color: theme-color(primary);
+  color: theme-color(text-light);
   cursor: pointer;
 
   &:hover {
-    background-color: theme(hover);
+    background-color: theme-color(hover);
   }
   &.secondary {
-    background-color: theme(secondary);
-    color: theme(text);
+    background-color: theme-color(secondary);
+    color: theme-color(text-light);
+  }
+}
+
+.modal-delete-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+  .modal-delete-container-modal {
+    background: theme-color(background);
+    border-radius: 8px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: variables.$shadow-base;
+    position: relative;
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+    }
+
+    p {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: theme-color(text-dark);
+    }
+
+    &__content {
+      margin-top: 1rem;
+    }
+  }
+
+  &-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &__icon {
+      font-size: 1.2rem;
+      color: theme-color(primary);
+
+      &:hover {
+        color: theme-color(hover);
+      }
+    }
+  }
+
+  button {
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+  }
+
+  .btn-cancel {
+    background-color: theme-color(background);
+    color: theme-color(text-dark);
+
+    &:hover {
+      background-color: theme-color(hover);
+    }
+  }
+
+  .btn-delete {
+    background-color: theme-color(primary);
+    color: theme-color(text-light);
+
+    &:hover {
+      background-color: theme-color(hover);
+    }
   }
 }

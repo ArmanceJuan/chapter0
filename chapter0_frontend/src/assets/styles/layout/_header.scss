@@ -1,3 +1,6 @@
+@use "../abstracts/theme-utils" as *;
+@use "../abstracts/variables" as variables;
+
 .header {
   position: fixed;
   top: 0;
@@ -5,7 +8,7 @@
   width: 100%;
   max-width: 100vw;
   height: 4rem;
-  background-color: #f9f8f8;
+  background-color: theme-color(background);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,5 +24,33 @@
     padding-inline: 1rem;
     font-size: 2rem;
     display: inline-block;
+  }
+
+  &__links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
+
+    ul {
+      list-style: none;
+      display: flex;
+      gap: 1rem;
+      padding: 0;
+
+      li {
+        padding: 0.5rem;
+        border-radius: 4px;
+        background-color: theme-color(hover);
+        color: theme-color(text-light);
+        transition: variables.$transiton;
+
+        &:hover {
+          background-color: theme-color(primary);
+          color: theme-color(text-light);
+        }
+      }
+    }
   }
 }

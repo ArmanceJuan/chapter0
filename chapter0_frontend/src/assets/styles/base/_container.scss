@@ -1,3 +1,5 @@
+@use "../abstracts/theme-utils" as *;
+
 .content-container {
   width: 100%;
   display: flex;
@@ -6,7 +8,7 @@
   align-items: center;
   padding: 4rem 0rem;
   box-sizing: border-box;
-  background-color: antiquewhite;
+  background-color: theme-color(background);
 }
 
 .project-select-container {
@@ -16,5 +18,5 @@
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
-  background-color: aliceblue;
+  background-color: theme-color(background);
 }

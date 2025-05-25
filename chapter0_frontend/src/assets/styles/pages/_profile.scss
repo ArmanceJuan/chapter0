@@ -1,3 +1,5 @@
+@use "../abstracts/theme-utils" as *;
+
 .user-profile {
   width: 100vw;
   display: flex;
@@ -5,6 +7,10 @@
   gap: 1rem;
   padding: 1rem;
   box-sizing: border-box;
+
+  p {
+    color: theme-color(text-dark);
+  }
 
   &__projects {
     width: 100vw;
@@ -17,12 +23,16 @@
     h2 {
       padding-top: 1rem;
     }
+
+    p {
+      color: theme-color(text-dark);
+    }
   }
 
   &__projects__list {
     list-style: none;
     margin: 0;
-    background-color: white;
+    background-color: theme-color(side);
     opacity: 0.5rem;
 
     li {

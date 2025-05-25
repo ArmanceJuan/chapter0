@@ -2,6 +2,8 @@ import { Response } from "express";
 import { eq } from "drizzle-orm";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { db, storyArcs } from "../db";
+import { validateStoryArc } from "../lib/security/validation/validateStoryarc";
+import { sanitizeStoryArc } from "../lib/security/sanitation/sanitizerStoryarc";
 
 export const createStoryArc = async (
   req: AuthenticatedRequest,
@@ -26,15 +28,29 @@ export const createStoryArc = async (
       return;
     }
 
+    validateStoryArc({
+      name,
+      description,
+      linkedArcs,
+      imageUrl,
+      status,
+    });
+    const sanitizedData = sanitizeStoryArc({
+      name,
+      description,
+      linkedArcs,
+      imageUrl,
+      status,
+    });
     const storyArc = await db
       .insert(storyArcs)
       .values({
         projectId,
-        name,
-        description,
-        linkedArcs,
-        imageUrl,
-        status,
+        name: sanitizedData.name,
+        description: sanitizedData.description,
+        linkedArcs: sanitizedData.linkedArcs,
+        imageUrl: sanitizedData.imageUrl,
+        status: sanitizedData.status,
       })
       .returning();
 
@@ -104,13 +120,7 @@ export const updateStoryArc = async (
 ): Promise<void> => {
   try {
     const { storyArcId, projectId } = req.params;
-    const {
-      storyArcTitle,
-      storyArcDescription,
-      storyArcStatus,
-      linkedArcs,
-      imageUrl,
-    } = req.body;
+    const { name, description, status, linkedArcs, imageUrl } = req.body;
 
     const userId = req.user?.id;
     if (!userId || !storyArcId || !projectId) {
@@ -129,21 +139,36 @@ export const updateStoryArc = async (
     }
 
     type StoryArcUpdate = {
-      storyArcTitle?: string;
-      storyArcDescription?: string;
-      storyArcStatus?: boolean;
+      name?: string;
+      description?: string;
+      status?: boolean;
       linkedArcs?: string;
       imageUrl?: string;
       updatedAt?: Date;
     };
 
     const updates: StoryArcUpdate = {};
-    if (storyArcTitle) updates.storyArcTitle = storyArcTitle;
-    if (storyArcDescription) updates.storyArcDescription = storyArcDescription;
-    if (storyArcStatus) updates.storyArcStatus = storyArcStatus;
+    if (name) updates.name = name;
+    if (description) updates.description = description;
+    if (status) updates.status = status;
     updates.updatedAt = new Date();
     if (linkedArcs) updates.linkedArcs = linkedArcs;
     if (imageUrl) updates.imageUrl = imageUrl;
+
+    validateStoryArc({
+      name,
+      description,
+      linkedArcs,
+      imageUrl,
+      status,
+    });
+    const sanitizedData = sanitizeStoryArc({
+      name,
+      description,
+      linkedArcs,
+      imageUrl,
+      status,
+    });
 
     await db.update(storyArcs).set(updates).where(eq(storyArcs.id, storyArcId));
     res.status(200).json({ message: "StoryArc updated successfully", updates });

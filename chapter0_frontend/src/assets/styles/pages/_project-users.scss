@@ -1,0 +1,5 @@
+@use "../abstracts/theme-utils" as *;
+
+.project-users-list {
+  color: theme-color(text-dark);
+}

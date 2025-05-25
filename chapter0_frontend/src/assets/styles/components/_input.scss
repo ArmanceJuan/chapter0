@@ -1,3 +1,5 @@
+@use "../abstracts/theme-utils" as *;
+
 .input-container {
   display: flex;
   flex-direction: column;
@@ -8,7 +10,7 @@
     width: 100%;
     padding: 0.5rem;
     border: 1px solid #bfbfbf;
-    background-color: white;
+    background-color: theme-color(side);
   }
 }
 
@@ -23,7 +25,7 @@
     width: 100%;
     padding: 0.5rem;
     border: 1px solid #bfbfbf;
-    background-color: white;
+    background-color: theme-color(side);
     height: 300px;
   }
 }

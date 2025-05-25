@@ -1,5 +1,6 @@
 @use "../abstracts/variables" as variables;
 @use "../abstracts/typographies" as typo;
+@use "../abstracts/theme-utils" as *;
 
 .button-new {
   position: fixed;
@@ -9,15 +10,15 @@
   right: 1rem;
   border-radius: 50%;
   border: none;
-  background-color: grey;
+  background-color: theme-color(primary);
+  color: theme-color(text-light);
 }
 
 .button-new-menu {
   position: fixed;
   bottom: 0;
   right: 0;
-  background-color: grey;
-
+  background-color: theme-color(primary);
   border-radius: variables.$border-radius;
   height: 27rem;
   width: 15rem;
@@ -29,11 +30,13 @@
     text-align: left;
     border: none;
     cursor: pointer;
-    background-color: grey;
+    background-color: theme-color(primary);
+    color: theme-color(text-light);
     padding: 1rem 2rem;
+    border-radius: variables.$border-radius;
 
     &:hover {
-      background-color: lightblue;
+      background-color: theme-color(hover);
     }
   }
 }

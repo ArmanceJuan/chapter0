@@ -2,6 +2,8 @@ import { Response } from "express";
 import { eq } from "drizzle-orm";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { db, places } from "../db";
+import { sanitizePlace } from "../lib/security/sanitation/sanitizerPlace";
+import { validatePlace } from "../lib/security/validation/validatePlace";
 
 export const createPlace = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -19,16 +21,33 @@ export const createPlace = async (req: AuthenticatedRequest, res: Response) => {
       return;
     }
 
+    validatePlace({
+      name,
+      description,
+      history,
+      location,
+      imageUrl,
+      status,
+    });
+    const sanitizedData = sanitizePlace({
+      name,
+      description,
+      history,
+      location,
+      imageUrl,
+      status,
+    });
+
     const place = await db
       .insert(places)
       .values({
         projectId,
-        name,
-        description,
-        history,
-        location,
-        imageUrl,
-        status,
+        name: sanitizedData.name,
+        description: sanitizedData.description,
+        history: sanitizedData.history,
+        location: sanitizedData.location,
+        imageUrl: sanitizedData.imageUrl,
+        status: sanitizedData.status,
       })
       .returning();
 
@@ -123,7 +142,34 @@ export const updatePlace = async (req: AuthenticatedRequest, res: Response) => {
     if (status) updates.status = status;
     updates.updatedAt = new Date();
 
-    await db.update(places).set(updates).where(eq(places.id, placeId));
+    validatePlace({
+      name,
+      description,
+      history,
+      location,
+      imageUrl,
+      status,
+    });
+    const sanitizedData = sanitizePlace({
+      name,
+      description,
+      history,
+      location,
+      imageUrl,
+      status,
+    });
+    await db
+      .update(places)
+      .set({
+        name: sanitizedData.name,
+        description: sanitizedData.description,
+        history: sanitizedData.history,
+        location: sanitizedData.location,
+        imageUrl: sanitizedData.imageUrl,
+        status: sanitizedData.status,
+        updatedAt: new Date(),
+      })
+      .where(eq(places.id, placeId));
 
     res.status(200).json({ message: "Place updated successfully" });
   } catch (error) {
