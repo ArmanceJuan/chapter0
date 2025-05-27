@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { sanitizeData } from "../lib/security/sanitation/sanitizeUser";
+import { validateUser } from "../lib/security/validation/validateUser";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -347,6 +348,3 @@ export const getMe = async (
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-function validateUser(arg0: { email: any; username: any; password: any }) {
-  throw new Error("Function not implemented.");
-}

@@ -1,4 +1,4 @@
-export const validateUsername = (data: {
+export const validateUser = (data: {
   username: string;
   email: string;
   password: string;

@@ -3,7 +3,7 @@ import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { eq } from "drizzle-orm";
 import { db, projects, projectUsers } from "../db";
 import { sanitizeProject } from "../lib/security/sanitation/sanitizeProject";
-import { validateProject } from "../lib/security/validation/validationProject";
+import { validateProject } from "../lib/security/validation/validateProject";
 
 export const createProject = async (
   req: AuthenticatedRequest,
