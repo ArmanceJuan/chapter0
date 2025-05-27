@@ -43,12 +43,12 @@ const ProjectForm = ({ isEdit }: Props) => {
     try {
       if (isEdit) {
         await updateProject({ ...payload, id: projectId }).unwrap();
-        navigate(`/project/${projectId}/see`);
+        navigate(`/project/form/${projectId}/see`);
       } else {
         const result = await createProject(payload).unwrap();
         const newProjectId = result.project?.[0]?.id;
         if (newProjectId) {
-          navigate(`/project/${newProjectId}/see`);
+          navigate(`/project/form/${newProjectId}/see`);
         }
         console.log("Projet créé :", result);
       }
