@@ -42,7 +42,7 @@ const MenuMobile = () => {
       />
       {user?.isAdmin && (
         <FontAwesomeIcon
-          icon={faUser}
+          icon={faUserSecret}
           onClick={() => navigate(`${user?.id}/profile`)}
         />
       )}

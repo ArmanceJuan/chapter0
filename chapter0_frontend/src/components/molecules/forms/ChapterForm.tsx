@@ -48,7 +48,7 @@ const ChapterForm = ({ isEdit }: Props) => {
         name,
         number,
         content,
-        version,
+        version: String(version),
         status,
         projectId,
       }).unwrap();
