@@ -37,8 +37,8 @@ const AllProjects = () => {
             {projects.map((project: any) => (
               <li key={project.id}>
                 <h4>{project.name}</h4>
-                <p>{project.ownerName}</p>
-                <p>{project.id}</p>
+                <p>Propriétaire : {project.ownerName}</p>
+                <p>Id du projet : {project.id}</p>
                 <p>{project.description}</p>
               </li>
             ))}
