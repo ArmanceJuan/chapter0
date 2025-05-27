@@ -36,7 +36,6 @@ const CharacterView = ({ data }: { data: any }) => {
             </div>
             <div className="view-container__infos__item">
               <h4>Informations</h4>
-              <span>Status : {item.status ? "Actif" : "Inactif"}</span>
               <span>Créé le {item.createdAt}</span>
               <span>Modifié le {item.updatedAt}</span>
             </div>

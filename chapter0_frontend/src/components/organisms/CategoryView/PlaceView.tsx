@@ -22,7 +22,6 @@ const PlaceView = ({ data }: { data: any }) => {
             </div>
             <div>
               <h4>Informations</h4>
-              <p>Status : {item.status ? "Actif" : "Inactif"}</p>
               <p>Crée le : {item.createdAt}</p>
               <p>Mis à jour le : {item.updatedAt}</p>
             </div>

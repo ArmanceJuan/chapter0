@@ -76,7 +76,6 @@ const CharacterForm = ({ isEdit }: Props) => {
         if (newCharacterId) {
           navigate(`/project/${projectId}/character/${newCharacterId}/view`);
         }
-        console.log("Character créé :", result);
       }
     } catch (error) {
       console.error("Erreur lors de la création du character :", error);

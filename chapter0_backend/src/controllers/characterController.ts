@@ -73,6 +73,7 @@ export const createCharacter = async (
       .status(201)
       .json({ message: "Character created successfully", character });
   } catch (error) {
+    console.error("Erreur dans createCharacter :", error);
     res.status(500).json({ error: "Server error" });
   }
 };

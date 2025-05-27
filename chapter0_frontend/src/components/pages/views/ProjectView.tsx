@@ -21,7 +21,6 @@ const ProjectView = () => {
         </div>
         <div className="view-container__infos">
           <h4>Informations</h4>
-          <p>Status : {project.status ? "Actif" : "Inactif"}</p>
           <p>Crée le : {project.createdAt}</p>
           <p>Mis à jour le : {project.updatedAt}</p>
         </div>

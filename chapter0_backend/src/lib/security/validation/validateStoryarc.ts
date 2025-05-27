@@ -8,9 +8,6 @@ export const validateStoryArc = (data: {
   if (!data.name) {
     throw new Error("Le nom est requis");
   }
-  if (!data.status) {
-    throw new Error("Le statut est requis");
-  }
   if (data.name.length < 3 || data.name.length > 128) {
     throw new Error("Le nom doit être compris entre 3 et 128 caractères");
   }
