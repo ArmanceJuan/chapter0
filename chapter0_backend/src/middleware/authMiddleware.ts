@@ -19,16 +19,12 @@ export const authMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const authToken = req.headers.authorization;
+  const token = req.cookies.token;
 
-  if (!authToken || !authToken.startsWith("Bearer ")) {
-    res
-      .status(401)
-      .json({ message: "Authorization header missing or invalid" });
+  if (!token) {
+    res.status(401).json({ error: "Missing or invalid token" });
     return;
   }
-
-  const token = authToken.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { id: string };

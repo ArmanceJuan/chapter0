@@ -16,7 +16,13 @@ export const createUser = async (
   const { email, username, password, isAdmin } = req.body;
   try {
     if (!email || !username || !password) {
-      res.status(400).json({ error: "Missing required fields" });
+      res.status(400).json({
+        fields: {
+          email: !email ? "L'email est requis" : undefined,
+          username: !username ? "Le nom d'utilisateur est requis" : undefined,
+          password: !password ? "Le mot de passe est requis" : undefined,
+        },
+      });
       return;
     }
 
@@ -29,7 +35,11 @@ export const createUser = async (
       .where(eq(users.email, sanitized.email));
 
     if (existingUser.length > 0) {
-      res.status(400).json({ error: "Email already exists" });
+      res.status(400).json({
+        fields: {
+          email: "Cet email est déjà utilisé",
+        },
+      });
       return;
     }
 
@@ -58,9 +68,14 @@ export const createUser = async (
         expiresIn: "3d",
       }
     );
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+    });
     res.status(201).json({
-      message: "User created successfully",
-      token,
+      message: "Utilisateur créé avec succès",
       user: {
         id: createdUser.id,
         email: createdUser.email,
@@ -68,9 +83,16 @@ export const createUser = async (
         isAdmin: createdUser.isAdmin,
       },
     });
-  } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+  } catch (err: any) {
+    const message = err.message || "";
+    const fields: Record<string, string> = {};
+
+    if (message.includes("username")) fields.username = message;
+    if (message.includes("email")) fields.email = message;
+    if (message.includes("mot de passe") || message.includes("caractère"))
+      fields.password = message;
+
+    res.status(400).json({ fields });
   }
 };
 
@@ -226,24 +248,36 @@ export const deleteUser = async (
 };
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
   try {
-    const { email, password } = req.body;
-
     if (!email || !password) {
-      res.status(400).json({ error: "Missing required fields" });
+      res.status(400).json({
+        fields: {
+          email: !email ? "L'email est requis" : undefined,
+          password: !password ? "Le mot de passe est requis" : undefined,
+        },
+      });
       return;
     }
 
     const user = await db.select().from(users).where(eq(users.email, email));
 
     if (user.length === 0) {
-      res.status(404).json({ error: "User not found" });
+      res.status(404).json({
+        fields: {
+          email: "Aucun utilisateur trouvé avec cet email",
+        },
+      });
       return;
     }
 
     const validPassword = await bcrypt.compare(password, user[0].password);
     if (!validPassword) {
-      res.status(401).json({ error: "Invalid email or password" });
+      res.status(401).json({
+        fields: {
+          password: "Mot de passe incorrect",
+        },
+      });
       return;
     }
 
@@ -259,9 +293,14 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         expiresIn: "3d",
       }
     );
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+    });
     res.status(200).json({
       message: "Login successful",
-      token,
       user: {
         id: user[0].id,
         email: user[0].email,
@@ -280,6 +319,11 @@ export const logoutUser = async (
   res: Response
 ): Promise<void> => {
   try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.error("Error logging out user:", error);
