@@ -8,6 +8,7 @@ const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [register, { isLoading }] = useRegisterMutation();
   const [errorFields, setErrorFields] = useState<{ [key: string]: string }>({});
   const [success, setSuccess] = useState("");
@@ -19,7 +20,7 @@ const RegisterForm = () => {
     setSuccess("");
 
     try {
-      await register({ email, username, password }).unwrap();
+      await register({ email, username, password, isAdmin }).unwrap();
       navigate("/");
     } catch (err: any) {
       if (err?.data?.fields) {
@@ -63,6 +64,15 @@ const RegisterForm = () => {
       {errorFields.password && (
         <p className="error-message">{errorFields.password}</p>
       )}
+      <div className="checkbox-field">
+        <input
+          type="checkbox"
+          id="isAdmin"
+          checked={isAdmin}
+          onChange={(e) => setIsAdmin(e.target.checked)}
+        />
+        <label htmlFor="isAdmin">Administrateur</label>
+      </div>
       {success && <p className="auth-form-success">{success}</p>}
       <Button
         type="submit"

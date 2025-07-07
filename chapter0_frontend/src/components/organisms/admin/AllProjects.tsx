@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useGetUserQuery } from "../../../store/slices/authSlice";
 import { useGetAllProjectsQuery } from "../../../store/slices/adminSlice";
 import { useEffect } from "react";
+import NewProjecButton from "../../molecules/NewProjecButton";
+import ButtonAction from "../../atoms/buttons/ButtonAction";
 
 type User = {
   id: string;
@@ -32,18 +34,43 @@ const AllProjects = () => {
           <p>Aucun projet</p>
         </section>
       ) : (
-        <section className="project-select-container">
-          <ul>
-            {projects.map((project: any) => (
-              <li key={project.id}>
-                <h4>{project.name}</h4>
-                <p>Propriétaire : {project.ownerName}</p>
-                <p>Id du projet : {project.id}</p>
-                <p>{project.description}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <>
+          <section className="project-select-container">
+            <NewProjecButton />
+          </section>
+
+          <section className="project-select-container">
+            <ul>
+              {projects.map((project: any) => (
+                <li key={project.id}>
+                  <div>
+                    <h4>{project.name}</h4>
+                    <div className="project-actions">
+                      <ButtonAction
+                        variant="see"
+                        projectId={project.id}
+                        className="project-infos__actions__button"
+                      />
+                      <ButtonAction
+                        variant="edit"
+                        projectId={project.id}
+                        className="project-infos__actions__button"
+                      />
+                      <ButtonAction
+                        variant="delete"
+                        projectId={project.id}
+                        className="project-infos__actions__button"
+                      />
+                    </div>
+                  </div>
+                  <p>Propriétaire : {project.ownerName}</p>
+                  <p>Id du projet : {project.id}</p>
+                  <p>{project.description}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </>
       )}
     </section>
   );

@@ -10,6 +10,7 @@ const ProjectView = () => {
     error,
   } = useGetProjectQuery({ id: projectId });
 
+  console.log("ProjectView", project);
   if (isLoading) return <p>Chargement du projet...</p>;
   if (error || !project) return <p>Erreur lors de la récupération du projet</p>;
   return (
