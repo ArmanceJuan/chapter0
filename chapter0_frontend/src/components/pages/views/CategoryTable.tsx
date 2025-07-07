@@ -9,10 +9,17 @@ import lieu from "/img/lieu.jpg";
 import perso from "/img/perso.jpg";
 import arc from "/img/arc.jpg";
 import { useGetProjectQuery } from "../../../store/slices/projectSlice";
-import { useAuthStore } from "../../../store/useAuthStore";
+import { useGetUserQuery } from "../../../store/slices/authSlice";
 
 type Props = {
   category: "chapter" | "character" | "place" | "storyarc";
+};
+
+type User = {
+  id: string;
+  email: string;
+  username: string;
+  isAdmin: boolean;
 };
 
 const CategoryTitles: Record<Props["category"], string> = {
@@ -25,7 +32,8 @@ const CategoryTitles: Record<Props["category"], string> = {
 const CategoryTable = ({ category }: Props) => {
   const { projectId } = useProjectStore();
   const { data: project } = useGetProjectQuery({ id: projectId });
-  const { user } = useAuthStore();
+  const { data: user } = useGetUserQuery() as { data: User | undefined };
+
   const navigate = useNavigate();
 
   const isOwner = project?.ownerId === user?.id;
@@ -43,6 +51,8 @@ const CategoryTable = ({ category }: Props) => {
       skip: !projectId,
     }
   );
+
+  if (isLoading) return <p>Chargement utilisateur...</p>;
 
   return (
     <div className="content-container">

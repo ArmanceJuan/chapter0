@@ -8,8 +8,8 @@ const MainLayout = () => {
       <Header />
       <main>
         <Outlet />
+        <MenuMobile />
       </main>
-      <MenuMobile />
     </div>
   );
 };

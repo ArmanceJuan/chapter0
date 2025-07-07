@@ -1,7 +1,6 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import MainLayout from "../components/templates/MainLayout";
 import Dashboard from "../components/pages/Dashboard";
-import NotFound from "../components/pages/NotFound";
 import AuthLayout from "../components/templates/AuthLayout";
 import Authenticate from "../components/pages/Authenticate";
 import Create from "../components/pages/Create";
@@ -124,7 +123,7 @@ const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <NotFound />,
+    element: <Navigate to="/access" />,
   },
 ]);
 

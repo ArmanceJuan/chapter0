@@ -1,19 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../store/useAuthStore";
 import Input from "./input/Input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useAddUserToProjectMutation } from "../../store/slices/usersProjectSlice";
+import { useGetUserQuery } from "../../store/slices/authSlice";
 
-const AddProjectModal = ({ onClose }: { onClose: () => void }) => {
+type AddProjectModalProps = {
+  onClose: () => void;
+};
+
+type User = {
+  id: string;
+  email: string;
+  username: string;
+  isAdmin: boolean;
+};
+
+const AddProjectModal = ({ onClose }: AddProjectModalProps) => {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
   const [projectId, setProjectId] = useState("");
   const [addUserToProject] = useAddUserToProjectMutation();
 
-  console.log("user modal:", user?.id);
+  const { data: user, isLoading } = useGetUserQuery() as {
+    data: User | undefined;
+    isLoading: boolean;
+  };
+
   const handleJoin = async () => {
+    if (!user) return;
     try {
       await addUserToProject({
         projectId,
@@ -26,6 +41,9 @@ const AddProjectModal = ({ onClose }: { onClose: () => void }) => {
       console.error("Erreur lors de l'ajout de l'utilisateur :", error);
     }
   };
+
+  if (isLoading) return <p>Chargement utilisateur...</p>;
+
   return (
     <section className="modal-container">
       <div className="modal">

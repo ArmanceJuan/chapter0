@@ -1,15 +1,25 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUpdateUserMutation } from "../../store/slices/userSlice";
-import { useAuthStore } from "../../store/useAuthStore";
 import Input from "../atoms/input/Input";
+import { useGetUserQuery } from "../../store/slices/authSlice";
+
+type User = {
+  id: string;
+  email: string;
+  username: string;
+  isAdmin: boolean;
+};
 
 const EditProfile = () => {
-  const { user } = useAuthStore();
+  const { data: user, isLoading } = useGetUserQuery() as {
+    data: User | undefined;
+    isLoading: boolean;
+  };
   const { userId } = useParams();
   const navigate = useNavigate();
-
   const [updateUser] = useUpdateUserMutation();
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -19,6 +29,12 @@ const EditProfile = () => {
   if (user?.id !== userId) {
     navigate("/");
   }
+
+  useEffect(() => {
+    if (!isLoading && user && user.id !== userId) {
+      navigate("/");
+    }
+  }, [user, userId, navigate, isLoading]);
 
   useEffect(() => {
     if (user) {

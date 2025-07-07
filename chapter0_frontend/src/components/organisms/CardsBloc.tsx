@@ -12,7 +12,6 @@ type Props = {
 type Category = "chapter" | "character" | "place" | "storyarc";
 
 const CardBloc = ({ projectId }: Props) => {
-  console.log("projectId:", projectId);
   const navigate = useNavigate();
   const { data: chapters } = useGetChaptersQuery(
     { projectId },

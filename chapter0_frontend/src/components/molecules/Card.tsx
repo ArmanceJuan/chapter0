@@ -5,8 +5,6 @@ interface CardProps {
 }
 
 const Card = ({ title, items, onClick }: CardProps) => {
-  const isMobile = window.innerWidth < 768;
-
   return (
     <div className="card" onClick={onClick}>
       <h2>{title}</h2>

@@ -4,21 +4,33 @@ import ChapterForm from "../molecules/forms/ChapterForm";
 import CharacterForm from "../molecules/forms/CharacterForm";
 import PlaceForm from "../molecules/forms/PlaceForm";
 import StoryArcForm from "../molecules/forms/StoryArcForm";
-import { useAuthStore } from "../../store/useAuthStore";
 import { useEffect } from "react";
+import { useGetUserQuery } from "../../store/slices/authSlice";
+
+type User = {
+  id: string;
+  email: string;
+  username: string;
+  isAdmin: boolean;
+};
 
 const Edit = () => {
-  const { user } = useAuthStore();
+  const { data: user, isLoading } = useGetUserQuery() as {
+    data: User | undefined;
+    isLoading: boolean;
+  };
   const { userId } = useParams();
   const location = useLocation();
   const path = location.pathname;
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?.id !== userId) {
+    if (!isLoading && user && user.id !== userId) {
       navigate("/");
     }
-  }, [user, userId, navigate]);
+  }, [user, userId, navigate, isLoading]);
+
+  if (isLoading) return <p>Chargement...</p>;
 
   return (
     <div>

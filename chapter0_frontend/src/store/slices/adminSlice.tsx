@@ -4,16 +4,7 @@ export const adminApiSlice = createApi({
   reducerPath: "adminReducer",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:3000/api",
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem("auth-store");
-      if (token) {
-        const parsed = JSON.parse(token);
-        if (parsed.state.token) {
-          headers.set("Authorization", `Bearer ${parsed.state.token}`);
-        }
-      }
-      return headers;
-    },
+    credentials: "include",
   }),
   tagTypes: ["admin"],
   endpoints: (build) => ({

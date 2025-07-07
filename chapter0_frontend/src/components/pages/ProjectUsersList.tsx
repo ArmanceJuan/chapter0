@@ -4,7 +4,6 @@ import {
   useGetUsersByProjectQuery,
   useUpdateUserRoleMutation,
 } from "../../store/slices/usersProjectSlice";
-import { useAuthStore } from "../../store/useAuthStore";
 import Select from "../atoms/Select";
 import { useGetProjectQuery } from "../../store/slices/projectSlice";
 
@@ -22,10 +21,20 @@ type ProjectUsers = {
   role: "reader" | "collaborator" | "owner" | "pending";
 };
 
+type User = {
+  id: string;
+  email: string;
+  username: string;
+  isAdmin: boolean;
+};
+
 const ProjectUsersList = () => {
-  const { user: currentUser } = useAuthStore();
-  const { projectId, setActiveProject } = useProjectStore();
+  const { projectId } = useProjectStore();
   const { data: project } = useGetProjectQuery({ id: projectId });
+  const { data: currentUser, isLoading: isUserLoading } = useGetUserQuery() as {
+    data: User | undefined;
+    isLoading: boolean;
+  };
 
   const {
     data: users,
@@ -56,7 +65,7 @@ const ProjectUsersList = () => {
     }
   };
 
-  if (isLoading) return <p>Chargement des utilisateurs...</p>;
+  if (isLoading || isUserLoading) return <p>Chargement des utilisateurs...</p>;
   if (error) return <p>Erreur lors de la récupération des utilisateurs</p>;
 
   return (

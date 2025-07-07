@@ -1,26 +1,35 @@
 import { useEffect } from "react";
 import { useProjectStore } from "../../store/projectStore";
 import { useGetProjectsByUserQuery } from "../../store/slices/usersProjectSlice";
-import { useAuthStore } from "../../store/useAuthStore";
 import CardBloc from "../organisms/CardsBloc";
 import ProjectSelector from "../molecules/project-selector/ProjectSelector";
 import NewButton from "../organisms/newButton/NewButton";
 import ButtonAction from "../atoms/buttons/ButtonAction";
 import NewProjecButton from "../molecules/NewProjecButton";
 import { useGetProjectQuery } from "../../store/slices/projectSlice";
+import { useGetUserQuery } from "../../store/slices/authSlice";
+
+type User = {
+  id: string;
+  email: string;
+  username: string;
+  isAdmin: boolean;
+};
 
 const Dashboard = () => {
-  const { user } = useAuthStore();
+  const { data: user } = useGetUserQuery() as { data: User | undefined };
   const { projectId, setActiveProject } = useProjectStore();
   const { data: project } = useGetProjectQuery({ id: projectId });
 
   const autoriseUser = project?.ownerId === user?.id || user?.isAdmin;
 
   const {
-    data: projects,
+    data: projects = [],
     isLoading,
     error,
-  } = useGetProjectsByUserQuery(user?.id, { skip: !user?.id });
+  } = useGetProjectsByUserQuery(user?.id, {
+    skip: !user?.id,
+  });
 
   useEffect(() => {
     if (projects?.length === 1 && !projectId) {

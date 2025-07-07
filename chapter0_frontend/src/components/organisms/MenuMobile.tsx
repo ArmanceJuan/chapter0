@@ -7,28 +7,39 @@ import {
   faRightFromBracket,
   faUserSecret,
 } from "@fortawesome/free-solid-svg-icons";
-import { useAuthStore } from "../../store/useAuthStore";
-import { useLogoutMutation } from "../../store/slices/authSlice";
+import {
+  useGetUserQuery,
+  useLogoutMutation,
+} from "../../store/slices/authSlice";
 import { useProjectStore } from "../../store/projectStore";
+
+type User = {
+  id: string;
+  email: string;
+  username: string;
+  isAdmin: boolean;
+};
 
 const MenuMobile = () => {
   const { projectId } = useProjectStore();
-  const { user } = useAuthStore();
   const navigate = useNavigate();
   const [logout] = useLogoutMutation();
-  const clearAuthState = useAuthStore((state) => state.clearAuthState);
+  const { data: user, isLoading } = useGetUserQuery() as {
+    data: User | undefined;
+    isLoading: boolean;
+  };
 
   const handleLogout = async () => {
     try {
       await logout(null);
-      clearAuthState();
       navigate("/access");
     } catch (error) {
       console.log("Erreur lors de la déconnexion", error);
     }
   };
 
-  console.log("projectId:", projectId);
+  if (isLoading) return <p>Chargement utilisateur...</p>;
+
   return (
     <div className="menu-mobile">
       <FontAwesomeIcon icon={faHouse} onClick={() => navigate("/")} />

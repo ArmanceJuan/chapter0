@@ -2,24 +2,25 @@ import Input from "../../atoms/input/Input";
 import Button from "../../atoms/buttons/Button";
 import { useState } from "react";
 import { useLoginMutation } from "../../../store/slices/authSlice";
-import { useAuthStore } from "../../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [login] = useLoginMutation();
-  const setAuthState = useAuthStore((state) => state.setAuthState);
+  const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
+  const [errorFields, setErrorFields] = useState<{ [key: string]: string }>({});
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorFields({});
     try {
-      const response = await login({ email, password }).unwrap();
-      setAuthState({ token: response.token, user: response.user });
+      await login({ email, password }).unwrap();
       navigate("/");
-    } catch (error) {
-      console.error("Erreur lors de la connexion :", error);
+    } catch (err: any) {
+      if (err?.data?.fields) {
+        setErrorFields(err.data.fields);
+      }
     }
   };
 
@@ -33,6 +34,9 @@ const LoginForm = () => {
         children="Email"
         onChange={(e) => setEmail(e.target.value)}
       />
+      {errorFields.email && (
+        <p className="error-message">{errorFields.email}</p>
+      )}
       <Input
         type="password"
         placeholder="Mot de passe"
@@ -41,8 +45,15 @@ const LoginForm = () => {
         children="Mot de passe"
         onChange={(e) => setPassword(e.target.value)}
       />
-      <Button type="submit" className="auth-form-container__button">
-        Se connecter
+      {errorFields.password && (
+        <p className="error-message">{errorFields.password}</p>
+      )}{" "}
+      <Button
+        type="submit"
+        className="auth-form-container__button"
+        disabled={isLoading}
+      >
+        {isLoading ? "Connexion en cours..." : "Se connecter"}
       </Button>
     </form>
   );
