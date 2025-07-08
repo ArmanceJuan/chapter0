@@ -13,9 +13,16 @@ import { useDeleteChapterMutation } from "../../../store/slices/chapterSlice";
 import { useDeleteStoryArcMutation } from "../../../store/slices/storyArcSlice";
 import { useDeletePlaceMutation } from "../../../store/slices/placeSlice";
 import { useDeleteCharacterMutation } from "../../../store/slices/characterSlice";
+import { useDeleteProjectMutation } from "../../../store/slices/projectSlice";
 
 type Variant = "see" | "edit" | "delete" | "new" | "more" | "add";
-type Category = "chapter" | "storyarc" | "place" | "character" | "profile";
+type Category =
+  | "chapter"
+  | "storyarc"
+  | "place"
+  | "character"
+  | "profile"
+  | "project";
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant: Variant;
@@ -74,13 +81,15 @@ const ButtonAction = ({
   const [deleteCharacter] = useDeleteCharacterMutation();
   const [deletePlace] = useDeletePlaceMutation();
   const [deleteStoryArc] = useDeleteStoryArcMutation();
+  const [deleteProject] = useDeleteProjectMutation();
 
   const mutationMap: Record<Category, any> = {
     chapter: deleteChapter,
     character: deleteCharacter,
     place: deletePlace,
     storyarc: deleteStoryArc,
-    profile: null, // pas de suppression
+    project: deleteProject,
+    profile: null,
   };
 
   const handleDelete = async () => {

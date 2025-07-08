@@ -55,6 +55,3 @@ export const {
   useUpdateProjectMutation,
   useDeleteProjectMutation,
 } = projectApiSlice;
-function getState() {
-  throw new Error("Function not implemented.");
-}

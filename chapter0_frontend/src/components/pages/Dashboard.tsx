@@ -42,7 +42,6 @@ const Dashboard = () => {
   if (isLoading) return <p>Chargement des projets...</p>;
   if (error) return <p>Erreur lors de la récupération des projets</p>;
 
-  console.log("projects:", projectId);
   return (
     <div className="content-container">
       {projects.length === 0 ? (

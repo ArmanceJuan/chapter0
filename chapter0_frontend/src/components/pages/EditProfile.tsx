@@ -58,7 +58,6 @@ const EditProfile = () => {
       }
 
       const response = await updateUser(payload).unwrap();
-      console.log("Mis à jour du profil :", response);
       navigate(`/${user?.id}/profile`);
     } catch (error) {
       console.error("Erreur lors de la mise à jour du profil :", error);

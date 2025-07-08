@@ -1,5 +1,3 @@
-import ButtonAction from "../atoms/buttons/ButtonAction";
-
 type Props = {
   title: string;
   description: string;

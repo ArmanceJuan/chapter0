@@ -69,7 +69,6 @@ const CharacterForm = ({ isEdit }: Props) => {
           id: characterId,
         }).unwrap();
         navigate(`/project/${projectId}/character/${characterId}/view`);
-        console.log("Character mis à jour :", result);
       } else {
         const result = await createCharacter(payload).unwrap();
         const newCharacterId = result.character?.[0]?.id;

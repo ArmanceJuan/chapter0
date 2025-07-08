@@ -14,7 +14,6 @@ type Props = {
 const ProjectForm = ({ isEdit }: Props) => {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  console.log("projectId:", projectId);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -50,7 +49,6 @@ const ProjectForm = ({ isEdit }: Props) => {
         if (newProjectId) {
           navigate(`/project/form/${newProjectId}/see`);
         }
-        console.log("Projet créé :", result);
       }
     } catch (error) {
       console.error("Erreur lors de la création du projet :", error);

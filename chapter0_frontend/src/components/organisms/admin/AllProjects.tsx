@@ -59,7 +59,9 @@ const AllProjects = () => {
                       <ButtonAction
                         variant="delete"
                         projectId={project.id}
+                        id={project.id}
                         className="project-infos__actions__button"
+                        category="project"
                       />
                     </div>
                   </div>

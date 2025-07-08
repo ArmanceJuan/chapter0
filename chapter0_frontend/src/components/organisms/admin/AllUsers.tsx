@@ -2,7 +2,6 @@ import { useGetAllUsersQuery } from "../../../store/slices/adminSlice";
 
 const AllUsers = () => {
   const { data: users, isLoading, error } = useGetAllUsersQuery();
-  console.log("users:", users);
   if (isLoading) return <p>Chargement des utilisateurs...</p>;
   if (error) return <p>Erreur lors de la récupération des utilisateurs</p>;
   return (

@@ -6,6 +6,7 @@ import {
 } from "../../store/slices/usersProjectSlice";
 import Select from "../atoms/Select";
 import { useGetProjectQuery } from "../../store/slices/projectSlice";
+import { useGetUserQuery } from "../../store/slices/authSlice";
 
 const ROLES = [
   { label: "Lecteur", value: "reader" },
