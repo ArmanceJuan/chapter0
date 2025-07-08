@@ -58,8 +58,7 @@ export const addUserToProject = async (
   res: Response
 ) => {
   const { projectId } = req.params;
-  const { user, role, userId } = req.body;
-  console.log("user:", user);
+  const { role, userId } = req.body;
   try {
     await db.insert(projectUsers).values({ projectId, userId, role });
     if (role === "pending") {

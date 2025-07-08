@@ -13,17 +13,13 @@ export const createStoryArc = async (
     const { projectId } = req.params;
     const { name, description, linkedArcs, imageUrl, status } = req.body;
 
-    console.log("body reçu :", req.body);
-
     const userId = req.user?.id;
     if (!userId || !projectId) {
-      console.log("userId ou projectId null");
       res.status(400).json({ error: "Missing user or project id" });
       return;
     }
 
     if (!name) {
-      console.log("name null");
       res.status(400).json({ error: "Missing required fields" });
       return;
     }
@@ -53,8 +49,6 @@ export const createStoryArc = async (
         status: sanitizedData.status,
       })
       .returning();
-
-    console.log("body reçu :", req.body);
 
     res
       .status(201)

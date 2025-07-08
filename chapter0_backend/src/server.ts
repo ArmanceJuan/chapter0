@@ -32,7 +32,6 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
-console.log("✅ API routes mounted at /api");
 app.use("/api", router);
 
 (async () => {

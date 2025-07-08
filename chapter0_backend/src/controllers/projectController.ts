@@ -47,8 +47,6 @@ export const createProject = async (
       .insert(projectUsers)
       .values({ projectId: project[0].id, userId: ownerId, role: "owner" });
 
-    console.log("req.user", req.user);
-
     res.status(201).json({ message: "Project created successfully", project });
   } catch (error: any) {
     console.error("Error creating project:", error.message);
@@ -148,7 +146,6 @@ export const deleteProject = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
-  console.log("deleteProject called");
   try {
     const { projectId } = req.params;
     const user = req.user;

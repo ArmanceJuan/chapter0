@@ -8,10 +8,8 @@ export const isCollaboratorMiddleware = async (
 ) => {
   const user = req.user;
   const { projectId } = req.params;
-  console.log("user", user);
 
   if (user.isAdmin) {
-    console.log("User is admin, allowing request.");
     next();
     return;
   }

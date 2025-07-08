@@ -17,7 +17,6 @@ export const isOwnerMiddleware = async (
   }
 
   if (user.isAdmin) {
-    console.log("✅ Admin detected, access granted.");
     return next();
   }
 
