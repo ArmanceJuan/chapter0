@@ -6,8 +6,15 @@ export const isCollaboratorMiddleware = async (
   res: any,
   next: any
 ) => {
-  const userId = req.user?.id;
+  const user = req.user;
   const { projectId } = req.params;
+  console.log("user", user);
+
+  if (user.isAdmin) {
+    console.log("User is admin, allowing request.");
+    next();
+    return;
+  }
 
   try {
     const collaboratorships = await db
@@ -16,7 +23,7 @@ export const isCollaboratorMiddleware = async (
       .where(
         and(
           eq(projectUsers.projectId, projectId),
-          eq(projectUsers.userId, userId)
+          eq(projectUsers.userId, user.userId)
         )
       );
     const userProject = collaboratorships[0];

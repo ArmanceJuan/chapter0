@@ -1,7 +1,15 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { eq } from "drizzle-orm";
-import { db, projects, projectUsers } from "../db";
+import {
+  chapters,
+  characters,
+  db,
+  places,
+  projects,
+  projectUsers,
+  storyArcs,
+} from "../db";
 import { sanitizeProject } from "../lib/security/sanitation/sanitizeProject";
 import { validateProject } from "../lib/security/validation/validateProject";
 
@@ -68,6 +76,7 @@ export const getProjectById = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
+  if (res.headersSent) return;
   try {
     const { projectId } = req.params;
     const project = await db
@@ -139,8 +148,10 @@ export const deleteProject = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
+  console.log("deleteProject called");
   try {
     const { projectId } = req.params;
+    const user = req.user;
     const project = await db
       .select()
       .from(projects)
@@ -150,11 +161,17 @@ export const deleteProject = async (
       res.status(404).json({ error: "Project not found" });
       return;
     }
-    if (project[0].ownerId !== req.user?.id) {
+
+    if (project[0].ownerId !== req.user?.id && !user?.isAdmin) {
       res.status(403).json({ error: "Forbidden : It's not your account" });
       return;
     }
 
+    await db.delete(chapters).where(eq(chapters.projectId, projectId));
+    await db.delete(characters).where(eq(characters.projectId, projectId));
+    await db.delete(places).where(eq(places.projectId, projectId));
+    await db.delete(storyArcs).where(eq(storyArcs.projectId, projectId));
+    await db.delete(projectUsers).where(eq(projectUsers.projectId, projectId));
     await db.delete(projects).where(eq(projects.id, projectId));
 
     res.status(200).json({ message: "Project deleted successfully" });

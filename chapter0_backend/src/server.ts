@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://f974-2a01-cb1c-e42-d300-11c5-2605-987f-5c60.ngrok-free.app",
+  "https://2cbcd86fc2c4.ngrok-free.app",
   "https://9821-2001-861-4446-6670-8c9d-4b08-ed34-53fa.ngrok-free.app",
 ];
 

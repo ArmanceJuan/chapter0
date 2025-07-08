@@ -12,18 +12,12 @@ export const isOwnerMiddleware = async (
   const { projectId } = req.params;
 
   if (!user || !projectId) {
-    console.log("Middleware check failed: missing user or projectId", {
-      user,
-      projectId,
-    });
-
     res.status(401).json({ error: "Missing user or project id" });
     return;
   }
 
   if (user.isAdmin) {
-    console.log("User is admin, allowing request.");
-
+    console.log("✅ Admin detected, access granted.");
     return next();
   }
 
