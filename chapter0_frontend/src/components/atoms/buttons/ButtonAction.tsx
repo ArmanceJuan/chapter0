@@ -108,8 +108,6 @@ const ButtonAction = ({
   };
 
   const handleClick = () => {
-    console.log("Navigation vers :", variant, projectId);
-
     if (onClick) {
       return onClick();
     }
